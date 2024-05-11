@@ -6,18 +6,19 @@ import {
     useWindowDimensions,
     FlatList,
   } from "react-native";
-  import React, { useState } from "react";
+  import React, { useContext, useState } from "react";
   import { SafeAreaView } from "react-native-safe-area-context";
   import { COLORS, FONTS, SIZES, images } from "../../constants";
   import { StatusBar } from "expo-status-bar";
   import { MaterialIcons } from "@expo/vector-icons";
+import Mycontext from "../../config/Mycontext";
 
 
 
   
-  const Profile = ({navigation}) => {
-    const layout = useWindowDimensions();
-    const [index, setIndex] = useState(0);    
+  const Profile = ({navigation}) => { 
+    const dlUser= useContext(Mycontext)
+
     const ToEditProfile = () =>{
         navigation.navigate('EditProfile');
     }
@@ -30,7 +31,7 @@ import {
       >
         <View style={{ flex: 1, alignItems: "center", marginTop:100 }}>
           <Image
-            source={images.profile}
+            source={{uri:dlUser[0].avatar}}
             resizeMode="contain"
             style={{
               height: 155,

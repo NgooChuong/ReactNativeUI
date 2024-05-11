@@ -1,27 +1,37 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Text, View, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, Image} from 'react-native';
-import Icon from './Icon';
 import {SIZES, SPACING, COLORS} from '../../constants';
 import { MaterialIcons } from "@expo/vector-icons";
 import ScreenHeader from './ScreenHeader';
 import Filter from './Filter';
-import Hamburger from 'react-native-hamburger';
 import { Searchbar } from 'react-native-paper';
+import Mycontext from '../../config/Mycontext';
 
 
 
-const MainHeader = () => {
+const MainHeader = ({navigation}) => {
   const [showComponent, setShowComponent] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const dlUser= useContext(Mycontext)
+  console.log('User',dlUser)
+  const [filter, setFilter] = useState({})
 
+  // const route = useRoute();
+  // const formData = route.params?.filter
+  // if (formData) console.log('fdata',formData)
   const handleButtonPress = () => {
-    setShowComponent(!showComponent);
+    setShowComponent(true);
   };
+
+  
+
   return (
+
+    
     <>
         <View style={{...styles.container}}>
             <Image
-              source={{ uri: 'https://tse1.mm.bing.net/th?id=OIP.cnrkuw5vYSBde9vFMxJrxwHaE8&pid=Api&rs=1&c=1&qlt=95&w=185&h=123'}}
+              source={{ uri: dlUser[0].avatar}}
               style={{ width: 30, height: 30, borderRadius: 15}}
             />
             <Searchbar style={styles.title}
@@ -37,10 +47,12 @@ const MainHeader = () => {
                 color={COLORS.black}
                     />
             </TouchableOpacity>
-            <Hamburger onPress={handleButtonPress} type = "spinCross" active = {showComponent}  />
-            {showComponent && <Filter />}
+            <TouchableOpacity style={{}} onPress={handleButtonPress}>
+                <MaterialIcons name="filter-alt" size={24} color="black" />
+            </TouchableOpacity>
+            {showComponent && <Filter fil ={filter} setfil = {setFilter} X={showComponent} setShow = {setShowComponent} />}
         </View>
-        <ScreenHeader/>
+        <ScreenHeader fil = {filter} navigation ={navigation} q={searchQuery}  />
     </>
         
     
