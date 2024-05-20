@@ -6,7 +6,8 @@ const MyUserReducer = (currentState, action) => {
             console.log(action.payload)
             return action.payload;
         case "logout":
-            return null;
+            
+            return action.payload;
 
     }
     console.log(currentState)

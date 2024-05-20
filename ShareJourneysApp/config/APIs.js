@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = 'http://192.168.1.17:8000/';
+const BASE_URL = 'http://192.168.1.10:8000/';
 
 export const endpoints = {
     'local': '/local/',
@@ -23,6 +23,11 @@ export const endpoints = {
     'reportUser': (reportId) => `/reports/${reportId}/userReport/`,
     'user': (id_user) => `/users/${id_user}/`,
     'apiEmail':"/api/send/mail",
+    'updatePost': (post_id) => `/posts/${post_id}/updatePost/`,
+    'hisPostRegister': "history/hisPostRegister/",
+    'historyPost': "history/hisPost/",
+    'rates':(rateId)=>`/posts/${rateId}/rates/`,
+    'UpPost': "/api/post/",
 };
 export const authApi = (accessToken) => axios.create({
     baseURL: BASE_URL,

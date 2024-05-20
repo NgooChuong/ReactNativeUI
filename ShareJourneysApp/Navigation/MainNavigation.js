@@ -3,8 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginNavigation from './Login/Navigation';
 import BottomTabNav from './BottomTabNav';
-import MyUserReducer from "../reducers/MyUserReducer";
-import Mycontext from "../config/Mycontext";
 
 const Stack = createNativeStackNavigator();
 

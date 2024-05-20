@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { Surface, Avatar,  } from 'react-native-paper';
 
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     }
   });
-export default PostOwner;
+export default memo(PostOwner);

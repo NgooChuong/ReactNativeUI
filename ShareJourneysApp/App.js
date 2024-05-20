@@ -56,12 +56,11 @@ import Mycontext from './config/Mycontext';
 
 
 
-
 const App = () =>{
   const [user, dispatch] = useReducer(MyUserReducer, null);
 
   return (
-    <Mycontext.Provider value={[user, dispatch]}>      
+    <Mycontext.Provider value={[user, dispatch]}>  
 
       <NavigationContainer>
           <MainNavigate/>

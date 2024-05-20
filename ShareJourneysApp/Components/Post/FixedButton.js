@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { memo, useContext, useState } from 'react';
 import { View, Text, StyleSheet ,ImageBackground,TouchableOpacity,Image, Alert} from 'react-native';
 import { COLORS} from '../../constants';
 import { MaterialIcons } from "@expo/vector-icons";
@@ -140,4 +140,4 @@ const styles = StyleSheet.create({
   });
 
 
-export default FixedButton;
+export default memo(FixedButton);

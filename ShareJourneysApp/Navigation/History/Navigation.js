@@ -5,13 +5,14 @@ import PostDetail from '../../Components/Post/PostDetail';
 import ScreenHeader from '../../Components/Home/ScreenHeader';
 import MainHeader from '../../Components/Home/MainHeader';
 import Profile from '../../Components/ProfileComponent/ProfileUser';
+import JourneyHistory from '../../Components/Post/JourneyHistory';
 
 const Stack = createNativeStackNavigator();
-const HomeNavigate = () => {
+const HistoryNavigate = () => {
   return (
     <>
-     <Stack.Navigator initialRouteName ="HomePage">
-        <Stack.Screen name="HomePage"  options={{headerShown: false}} component={MainHeader} />
+     <Stack.Navigator initialRouteName ="History">
+        <Stack.Screen name="History"  options={{headerShown: false}} component={JourneyHistory} />
         <Stack.Screen name="PostDetail" options={{headerShown: false}} component={PostDetail} />
         <Stack.Screen name="ProfileUser" options={{headerShown: false}} component={Profile} />
         <Stack.Screen name="PostDetail2" options={{headerShown: false}} component={PostDetail} />
@@ -22,4 +23,4 @@ const HomeNavigate = () => {
   );
 }
 
-export default HomeNavigate;
+export default HistoryNavigate;

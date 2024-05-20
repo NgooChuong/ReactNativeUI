@@ -5,8 +5,8 @@ import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox"
 
 import color from '../../style/color';
-// import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
-// import { authentication } from '../../firebase/firebaseconf';
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { authentication } from '../../firebase/firebaseconf';
 // import APIs, { authApi, endpoints } from '../../configs/APIs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../../Button';
@@ -16,18 +16,13 @@ import Mycontext from '../../config/Mycontext';
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState();
     const [password, setPassword] = useState();
-    const [isPasswordShown, setIsPasswordShown] = useState(false);
+    const [isPasswordShown, setIsPasswordShown] = useState(true);
     const [loading, setLoading] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [user, dispatch] = useContext(Mycontext);
     const loginUser = async () => {
-        // signInWithEmailAndPassword(authentication, username, password)
-        // .then(()=> console.log('user logged in'))
-        if(username =="admin" && password =='1234')
-        {
-            navigation.navigate("Home");
-            return;
-        }
+        signInWithEmailAndPassword(authentication, username, password)
+        .then(()=> console.log('user logged in'))
         setLoading(true);
         try {
             console.log(username,password);

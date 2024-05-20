@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import Swiper from 'react-native-swiper';
 
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SliderImage;
+export default memo(SliderImage);

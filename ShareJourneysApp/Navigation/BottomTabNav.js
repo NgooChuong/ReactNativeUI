@@ -14,6 +14,11 @@ import ProfileNavigate from "./Profile/navigation";
 import HomeNavigate from "./Home/Navigation";
 import { NavigationContainer } from "@react-navigation/native";
 import LoginNavigation from "./Login/Navigation";
+import JourneyHistory from "../Components/Post/JourneyHistory";
+import HistoryNavigate from "./History/Navigation";
+import UpPostNavigate from "./UpPostNavigation/navigation";
+import Home from "../Components/Chat/Home";
+import ChatNavigate from "./Chat/Navigation";
 
 const Tab = createBottomTabNavigator();
 
@@ -53,9 +58,39 @@ const BottomTabNav = () => {
             },
           }}
         />
+      <Tab.Screen
+          name="Chat"
+          component={ChatNavigate}
+          options={{
+            tabBarIcon: ({ focused }) => {
+              return (
+                <MaterialCommunityIcons
+                  name="chat"
+                  size={24}
+                  color={focused ? COLORS.carrot : COLORS.black}
+                />
+              );
+            },
+          }}
+        />
 
         <Tab.Screen
-          name="Messages"
+          name="UpPost"
+          component={UpPostNavigate}
+          options={{
+            tabBarIcon: ({ focused }) => {
+              return (
+                <MaterialCommunityIcons
+                  name="post"
+                  size={24}
+                  color={focused ? COLORS.carrot : COLORS.black}
+                />
+              );
+            },
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
           component={ProfileNavigate}
           options={{
             tabBarIcon: ({ focused }) => {
@@ -69,6 +104,22 @@ const BottomTabNav = () => {
             },
           }}
         />
+        <Tab.Screen
+          name="History"
+          component={HistoryNavigate}
+          options={{
+            tabBarIcon: ({ focused }) => {
+              return (
+                <MaterialCommunityIcons
+                  name="history"
+                  size={24}
+                  color={focused ? COLORS.carrot : COLORS.black}
+                />
+              );
+            },
+          }}
+        />
+
         
 
       </Tab.Navigator>

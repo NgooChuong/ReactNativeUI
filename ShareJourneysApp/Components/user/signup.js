@@ -1,29 +1,56 @@
-import { View, Text, Image, Pressable, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import { View, Text, Image, Pressable, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
 import color from '../../style/color';
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox"
 import * as ImagePicker from 'expo-image-picker';
-// import { addDoc, collection, doc, getFirestore, setDoc } from 'firebase/firestore';
-// import { authentication, db } from '../../firebase/firebaseconf';
+import { addDoc, collection, doc, getFirestore, setDoc } from 'firebase/firestore';
+import { authentication, db } from '../../firebase/firebaseconf';
 // import APIs from '../../config/APIs';
-// import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import APIs, { endpoints } from '../../config/APIs';
 import Button from '../../Button';
+import { HelperText } from 'react-native-paper';
 const Signup = ({ navigation }) => {
-    const [isPasswordShown, setIsPasswordShown] = useState(false);
+    const [isPasswordShown, setIsPasswordShown] = useState(true);
     const [isChecked, setIsChecked] = useState(false);
+    const [error, setError] = useState(false);
+    const [errorText, setErrorText] = useState('');
     const [user, setUser] = useState({
         "first_name": "",
         "last_name": "",
         "username": "",
         "password": "",
+        "confirm": "",
         "avatar": ""
     });
     const [loading, setLoading] = useState(false);
    
     const register = async () => {
+          
+          if (!user.username || user.username.length < 3) {
+            setError(true);
+            setErrorText('username không hợp lệ, username lớn hơn 3 kí tự ')
+            return;
+          }
+          if (!user.password || user.password.length < 6) {
+            setError(true);
+            setErrorText('password không hợp lệ, password lớn hơn 6 kí tự ')
+            return;
+          }
+          if (user.password != user.confirm) {
+            setError(true);
+            setErrorText('Mật khẩu không khớp!')
+            return;
+          }
+          if (!user.avatar) {
+            setError(true);
+            setErrorText('Phải chọn ảnh đại diện!')
+            return;
+          }
+          
+          setError(false);
         setLoading(true);
 
         const form = new FormData();
@@ -32,11 +59,11 @@ const Signup = ({ navigation }) => {
                 form.append(key, {
                     uri: user[key].uri,
                     name: user[key].fileName,
-                    type: user[key].type
+                    type: 'image/jpeg'
                 })
             } else
                 form.append(key, user[key]);
-
+        
         console.log(form)
 
         try {
@@ -45,6 +72,7 @@ const Signup = ({ navigation }) => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
+            await registerUser()
             navigation.navigate("Login");
             console.info(res.data);
         } catch (ex) {
@@ -54,23 +82,26 @@ const Signup = ({ navigation }) => {
             setLoading(false);
         }
     }
-    // const { username, password, avatar } = user;
-    // const registerUser = async () => {
-    //     createUserWithEmailAndPassword(authentication, username, password)
-    //     .then((userCredentials) => {
-    //         const userUID = userCredentials.user.uid;
-    //         const docRef = doc(db, 'users', userUID);
-    //         const docSnap = setDoc(docRef, {
-    //             avaterUrl: avatar ? avatar :'https://thumbs.dreamstime.com/b/businessman-avatar-line-icon-vector-illustration-design-79327237.jpg',
-    //             username,
-    //             password,
-    //             userUID,
-    //             email
-    //         })
+    const { username, password, avatar } = user;
+    const registerUser = async () => {
+        console.log("firese1")
+        await createUserWithEmailAndPassword(authentication, username, password)
+        .then( async (userCredentials) => {
+            console.log("firese1")
+            const userUID = userCredentials.user.uid;
+            const colRef = collection(db, username);
+            addDoc(colRef,{username:username})
+            const docRef = doc(db, 'users', userUID);
+            const docSnap = setDoc(docRef, {
+                avatarUrl:'https://thumbs.dreamstime.com/b/businessman-avatar-line-icon-vector-illustration-design-79327237.jpg',
+                username,
+                password,
+                userUID,
+            })
            
-    //     })
-    //     .then(() => console.log('succesful'))
-    // }
+        })
+        .then(() => console.log('succesful'))
+    }
     const picker = async () => {
         let {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -94,6 +125,7 @@ const Signup = ({ navigation }) => {
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: color.white }}>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <View style={{ flex: 1, marginHorizontal: 10 }}>
                 <View style={{ marginVertical:10 }}>
                     <Text style={{
@@ -258,6 +290,7 @@ const Signup = ({ navigation }) => {
                         paddingLeft: 22
                     }}>
                         <TextInput
+                            value={user.confirm} onChangeText={t => change("confirm", t)}
                             placeholder='Nhập xác nhận password của bạn...'
                             placeholderTextColor={color.black}
                             secureTextEntry={isPasswordShown}
@@ -306,6 +339,9 @@ const Signup = ({ navigation }) => {
 
                     <Text>I aggree to the terms and conditions</Text>
                 </View>
+                <HelperText type="error" visible={error}>
+                    {errorText}
+                </HelperText>
                 {loading===true?<ActivityIndicator />:<>
                         <Button
                             title="Sign Up"
@@ -416,6 +452,7 @@ const Signup = ({ navigation }) => {
                     </Pressable>
                 </View>
             </View>
+            </KeyboardAvoidingView>
         </ScrollView>
     )
 }

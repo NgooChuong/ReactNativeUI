@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from 'react';
+import React,{useState, useEffect, memo, useContext} from 'react';
 import { View, StyleSheet, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import SliderImage from './SliderImage';
@@ -9,10 +9,12 @@ import PostTitle from './PostTitle';
 import PostJourney from './PostJourney';
 import FixedButton from './FixedButton';
 import PostComments from './PostComments';
-import { Button } from 'react-native-paper';
+import { Button, IconButton, MD3Colors } from 'react-native-paper';
 import { MaterialIcons } from "@expo/vector-icons";
 import APIs, { endpoints } from '../../config/APIs';
 import Swiper from 'react-native-swiper';
+import Mycontext from '../../config/Mycontext';
+import { CommonActions, useRoute } from '@react-navigation/native';
 
 const Dot = () => (
   <View style={{ backgroundColor: 'rgba(0,0,0,.2)', width: 8, height: 8, borderRadius: 4, marginHorizontal: 5 }} />
@@ -23,19 +25,27 @@ const ActiveDot = () => (
 );
 
 const PostDetail = ({navigation,route}) =>{
-    const {place_id} = route.params;
+  console.log(route.params);
+
+    const {place_id,naviName} = route.params;
+  console.log(naviName);
+
     console.log('helo',place_id);
     const [visible, setVisible] = useState(false);
     const [isReportModalVisible, setIsReportModalVisible] = useState(false);
     const [detail, setDetail] = useState({});
     const [companions, setcompanion] = useState();
+    const [locked, setLocked] = useState({});
+    const dlUser= useContext(Mycontext)
 
+  
     const loadDetailPost = async () =>{
       try{
-        console.log('adwdaw')
         let res = await APIs.get(endpoints['posts'](place_id))
-        console.log(res.data)
-        console.log(res.data.pic)
+        setLocked({
+          'isLocked': res.data.active? "lock-open-variant" : "lock",
+          'color': res.data.active?'black':MD3Colors.error50
+        })
         setDetail(res.data)
         }
         catch(ex)
@@ -45,7 +55,7 @@ const PostDetail = ({navigation,route}) =>{
     }
     useEffect(()=>{
         loadDetailPost();
-    },[place_id,companions])
+    },[place_id,companions,isReportModalVisible])
 
 
     const handlePressReport = () => {
@@ -60,6 +70,22 @@ const PostDetail = ({navigation,route}) =>{
     } 
     // const images = detail.pic.map(picItem => picItem.picture);
 
+    const  Haslocked = async () => {
+      try{
+        let res = await APIs.patch(endpoints['updatePost'](place_id))
+        console.log(res.data)
+        setLocked({
+          'isLocked': res.data.active? "lock-open-variant" : "lock",
+          'color': res.data.active?'black':MD3Colors.error50
+        })
+        
+        }
+        catch(ex)
+        {
+          console.error(ex);
+        }
+    }
+
     return (
         <SafeAreaView style = {{height: '100%'}}>
             <TouchableOpacity
@@ -67,7 +93,11 @@ const PostDetail = ({navigation,route}) =>{
               styles.touchableOpacityGoBack
 
         }
-        onPress={() => navigation.goBack()}
+        onPress={() =>{
+            navigation.goBack(
+              naviName
+            )
+        }}
       >
         <MaterialIcons name="arrow-back" size={30} color="black" />
       </TouchableOpacity>
@@ -87,17 +117,28 @@ const PostDetail = ({navigation,route}) =>{
                 <View style={{flexDirection:'row', marginTop:30, marginLeft:10}}>
                     <Text style = {[styles.title, styles.text]}>Comments</Text>
                     <TouchableOpacity
-                    style={styles.button}
-                    onPress={handlePressReport}
-                    >
-                    <Text
-                        style={{...styles.text,textDecorationLine: 'underline'  }}
-                    >
-                        Xem bình luận
-                    </Text>
-               {isReportModalVisible &&  <PostComments  isVisible={isReportModalVisible} onClose={handlePressCloseReportModal} id_userPost = {detail.user.id} id_post = {place_id}/>}
+                      style={styles.button}
+                      onPress={handlePressReport}
+                      >
+                      <Text
+                          style={{...styles.text,textDecorationLine: 'underline'  }}
+                      >
+                          Xem bình luận
+                      </Text>
+                {isReportModalVisible &&  <PostComments islocked = {locked.isLocked}  isVisible={isReportModalVisible} onClose={handlePressCloseReportModal} id_userPost = {detail.user.id} id_post = {place_id}/>}
                 <View style = {{height: 100}}/>
-            </TouchableOpacity>
+                </TouchableOpacity>
+                {console.log('adwdadwadawdawdawdad',detail)}
+                { detail.user != undefined &&  detail.user.id == dlUser[0].id &&
+                  <IconButton
+                      icon={locked.isLocked} // Change icon based on state
+                      iconColor={locked.color}
+                      size={30}
+                      style = {{marginTop: -3}}
+                      onPress={() => {
+                        Haslocked();
+                      }}
+                    />}
                 </View>
 
             </ScrollView>

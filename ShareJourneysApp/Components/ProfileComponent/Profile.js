@@ -22,6 +22,13 @@ import Mycontext from "../../config/Mycontext";
     const ToEditProfile = () =>{
         navigation.navigate('EditProfile');
     }
+    const logout = () => {
+      dlUser[1]({
+          "type": "logout",
+          "payload": navigation.navigate('Login')
+      })
+    }
+
     return (
       <SafeAreaView
         style={{
@@ -50,7 +57,7 @@ import Mycontext from "../../config/Mycontext";
               marginVertical: 8,
             }}
           >
-            Melissa Peters
+            {dlUser[0].username}
           </Text>
           
   
@@ -88,6 +95,7 @@ import Mycontext from "../../config/Mycontext";
                 />
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={logout}
               style={{
                 width: '100%',
                 height: '10%',

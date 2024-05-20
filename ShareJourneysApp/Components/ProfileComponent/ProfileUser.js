@@ -31,7 +31,7 @@ const PhotosRoutes = ({navigation,pofile}) => {
     <ScrollView style={{ flex: 1, paddingHorizontal: 1 }}horizontal={true} showsHorizontalScrollIndicator={false}>
     {posts_current_user.map((user, index) => (
       <TouchableOpacity style={{ margin: 1, backgroundColor: color.white, padding:3, borderWidth: 1, borderColor: 'black', borderRadius: 10}} key={index}  
-      onPress={() => {navigation.navigate('PostDetail',{'place_id':user.id})}}>
+      onPress={() => {navigation.navigate('PostDetail2',{'place_id':user.id, "naviName": 'ProfileUser'})}}>
         <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 1 }}>
           <Image
             source={{ uri: user.user.avatar }}
@@ -49,8 +49,8 @@ const PhotosRoutes = ({navigation,pofile}) => {
                 aspectRatio: 1,
                 borderRadius: 12,
                 overflow: 'hidden',
-                width:"40%",
-                height:"100%",
+                width:100,
+                height:350,
                 margin:4
               }}
             >
@@ -81,6 +81,7 @@ const PhotosRoutes = ({navigation,pofile}) => {
 
 
 const Profile = ({navigation, route}) => {
+  console.log(122222222222222222222222222222222222222222222222222222222222222222222222222222222222222222)
   const {id} = route.params;
   console.log('userrrrrrrrrrrrrrrrrrrrrrrrrrrrr',id)
   

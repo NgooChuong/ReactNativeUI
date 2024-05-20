@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {Text, View, StyleSheet, TouchableOpacity, ScrollView,Image} from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import {Text, View, StyleSheet, TouchableOpacity, ScrollView,Image, RefreshControl} from 'react-native';
 import {SIZES, SPACING, COLORS} from '../../constants/theme';
 import { SEARCH_PLACES } from '../../data';
 import { MaterialIcons } from "@expo/vector-icons";
@@ -19,6 +19,14 @@ const ScreenHeader = ({navigation,fil,q}) => {
   const [SortTags, setSortTags] = useState([]) 
   const [SortPosts, setSortPosts] = useState([]) 
   const [tagFake, setStateFake] = useState([]) 
+  const [refreshing, setRefreshing] = useState(false);
+
+
+  // const onRefresh = useCallback(() => {
+  //   setRefreshing(true);
+  //   loadTag.then(loadPosts).then(() => setRefreshing(false));
+  // }, []);
+
   // const [visible, setVisible] = useState(true)
   var visible = true
   // const [tags, setTags] = useState([]);
@@ -27,7 +35,7 @@ const ScreenHeader = ({navigation,fil,q}) => {
   // const sortedUsers = users.sort((a, b) => b.age - a.age);
 
   const ToPostDetail = (id) =>{
-    navigation.navigate('PostDetail',{"place_id": id})
+    navigation.navigate('PostDetail',{"place_id": id,"naviName": 'HomePage'})
   }
 
 
@@ -52,22 +60,36 @@ const ScreenHeader = ({navigation,fil,q}) => {
     try {
         let url = `${endpoints['allposts']}?q=${q}&c=${fil.id_localcome}&a=${fil.id_localarrive}&t=${fil.id_tag}&ti=${fil.time}&r=${fil.id_check}`;
         let res = await APIs.get(url);
-        setSortPosts(res.data.sort((a,b) => b.avgRate - a.avgRate));
+        setSortPosts(res.data.sort((a,b) => b.avgRate - a.avgRate ));
     } catch(ex) {
         console.error(ex);
     }
   }
   useEffect(()=>{
+    console.log('anac')
     loadTag()
-  },[fil.id_tag])
+  },[fil.id_tag,refreshing])
 
   useEffect(()=>{
+    console.log('anac1')
     loadPosts()
-  },[q,fil])
+  },[q,fil,refreshing])
   
 // abc [1,2,3]
 // fill = 2
 
+
+const isCloseToTop = ({layoutMeasurement, contentOffset, contentSize}) => {
+  const paddingToTop = 20;
+  return contentOffset.y <= paddingToTop;
+};
+const loadMore = ({nativeEvent}) => {
+  console.log('123')
+  if ( isCloseToTop(nativeEvent)) {
+    console.log('acn')
+          setRefreshing(!refreshing);
+  }
+}
 
 const filterPosts =  (tag) => {
   return  SortPosts.filter((posts) =>posts.tags.some(tagP => tagP.name === tag.name))
@@ -85,7 +107,7 @@ const handleTags = (arr,) => {
   // fill -> xài filter
   return (
       <View style={{...styles.container, width:'100%', height:'100%'}}>
-            <ScrollView >
+            <ScrollView onScroll={loadMore}>
               {/*duyet qua tag*/}
               { SortTags.map((tag,index)=>(
                 <View key={index}>

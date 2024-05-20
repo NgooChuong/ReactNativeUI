@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {memo, useState} from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView,Animated ,ActivityIndicator } from 'react-native';
 import { MaterialIcons } from "@expo/vector-icons";
 import { SIZES , COLORS} from '../../constants';
@@ -228,4 +228,4 @@ const styles = StyleSheet.create({
 
   });
 
-export default PostJourney;
+export default memo(PostJourney);

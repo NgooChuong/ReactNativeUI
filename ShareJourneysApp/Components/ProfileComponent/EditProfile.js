@@ -38,28 +38,23 @@ import { v4 as uuidv4 } from 'uuid';
         'username': name,
         'avatar': selectedImage,
       };
+      console.log('1234',userData)
       const form = new FormData();
       for (let key in userData){
           if (key === 'avatar') {
               form.append(key, {
                   uri: userData[key].uri,
                   name: userData[key].fileName,
-                  type: userData[key].type
+                  type: 'image/jpeg'
               })
           } else
               form.append(key, userData[key]);
         }
-        const change = (field, value) => {
-          setUser(current => {
-              return {...current, [field]: value}
-          })
-          console.log("User Register:",userData)
-      }
-  
-      console.log(selectedImage)
+      console.log('12345', form._parts[4]);
+
       try {
           let a= await AsyncStorage.getItem('access-token')
-          let user = await authApi(a).patch(endpoints['current-user'],userData,{
+          let user = await authApi(a).patch(endpoints['current-user'],form,{
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -73,22 +68,27 @@ import { v4 as uuidv4 } from 'uuid';
           setLoading(false);
       }
     }
+
+
+  //   const change = (field, value) => {
+  //     console.log("User Register:",userData)
+  //     setUser(current => {
+  //         return {...current, [field]: value}
+  //     })
+  // }
+
+
+
     const handleImageSelection = async () => {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [4, 4],
-        quality: 1,
-      });
-  
-      console.log(result);
-  
+      let result = await ImagePicker.launchImageLibraryAsync();
+    
       if (!result.canceled) {
-        change("avatar", result.assets[0])
+        setSelectedImage(result.assets[0])
 
       }
+      
     };
-  
+   
     return (
       <SafeAreaView
         style={{
@@ -116,8 +116,9 @@ import { v4 as uuidv4 } from 'uuid';
             }}
           >
             <TouchableOpacity onPress={handleImageSelection}>
+            {console.log('abc',selectedImage)}
               <Image
-                source={{ uri: selectedImage }}
+                source={{ uri: selectedImage.uri || dlUser[0].avatar }}
                 style={{
                   height: 170,
                   width: 170,
