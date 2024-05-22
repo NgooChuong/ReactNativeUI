@@ -11,7 +11,7 @@ export function ListItem({title, subTitle, image, ImageComponent, onPress}) {
         >
             <View style={styles.container}>
                 {ImageComponent}
-               {<Image source={{uri:"https://res.cloudinary.com/depgwkadm/image/upload/v1716208718/fsqmfv8xt6x5k8axudq0.jpg"}} style={styles.image}/>} 
+               {<Image source={{uri:image}} style={styles.image}/>} 
                 <View style={styles.ownerHolder}>
                     <AppText inputText={title} stylesLing={styles.name} numberOfLines={1} />
                    {subTitle && <AppText inputText={subTitle} stylesLing={styles.listing} noOfLines={2}/>}

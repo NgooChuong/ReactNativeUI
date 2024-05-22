@@ -72,7 +72,8 @@ const Signup = ({ navigation }) => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            await registerUser()
+
+            await registerUser(res.data)
             navigation.navigate("Login");
             console.info(res.data);
         } catch (ex) {
@@ -82,18 +83,19 @@ const Signup = ({ navigation }) => {
             setLoading(false);
         }
     }
-    const { username, password, avatar } = user;
-    const registerUser = async () => {
+    const { username, password, } = user;
+    const registerUser = async (data) => {
+        const { avatar } = data;
+
         console.log("firese1")
         await createUserWithEmailAndPassword(authentication, username, password)
-        .then( async (userCredentials) => {
+        .then( (userCredentials) => {
             console.log("firese1")
             const userUID = userCredentials.user.uid;
-            const colRef = collection(db, username);
-            addDoc(colRef,{username:username})
-            const docRef = doc(db, 'users', userUID);
+            collection(db, username);
+            const docRef = doc(db, username, userUID);
             const docSnap = setDoc(docRef, {
-                avatarUrl:'https://thumbs.dreamstime.com/b/businessman-avatar-line-icon-vector-illustration-design-79327237.jpg',
+                avatarUrl:avatar,
                 username,
                 password,
                 userUID,

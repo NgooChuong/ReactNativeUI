@@ -1,5 +1,5 @@
 import { View, Text, Platform } from "react-native";
-import React, { useReducer } from "react";
+import React, { useReducer, useState } from "react";
 import {
   SimpleLineIcons,
   Fontisto,
@@ -37,18 +37,18 @@ const screenOptions = {
   },
 };
 const BottomTabNav = () => {
-
+  // const [visible, setVisible] = useState(true);
   return (
-  
-      <Tab.Navigator screenOptions={screenOptions}>
-
-        <Tab.Screen
+      
+      <Tab.Navigator screenOptions={screenOptions} >
+      <Tab.Screen
           name="Home"
           component={HomeNavigate}
           options={{
             headerShown: false,
             tabBarIcon: ({ focused }) => {
               return (
+                
                 <SimpleLineIcons
                   name="home"
                   size={24}
@@ -58,6 +58,7 @@ const BottomTabNav = () => {
             },
           }}
         />
+        
       <Tab.Screen
           name="Chat"
           component={ChatNavigate}
@@ -118,7 +119,9 @@ const BottomTabNav = () => {
               );
             },
           }}
+          
         />
+
 
         
 

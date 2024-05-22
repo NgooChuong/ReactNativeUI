@@ -445,9 +445,9 @@ const handleDestinationChange = (value, index) => {
                     </Picker>
                     <View>
                         <View style={{flexDirection:"row"}}>
-                        <TouchableOpacity style={{...styles.iconButton,flexDirection:"row"}}  onPress={(i)=>showDateNgayDenTGPicker(i)}>
+                        <TouchableOpacity style={{...styles.iconButton, width: 210,flexDirection:"row"}}  onPress={(i)=>showDateNgayDenTGPicker(i)}>
                         <FontAwesome name="calendar" size={24} color="black" />
-                        <Text>Chọn thời gian dự kiến đến :</Text>
+                        <Text>Chọn thời gian dự kiến đến</Text>
                         </TouchableOpacity>
                         </View>
                         <DateTimePicker 
@@ -472,7 +472,7 @@ const handleDestinationChange = (value, index) => {
           </View>
         </View>
           
-          {demAdd >=1 && <View style={{ flexDirection: 'row', justifyContent: 'space-between', height:80, width:"100%"}}>
+          {demAdd >=1 && <View style={{ flexDirection: 'row', justifyContent: 'space-between', height:40, width:"100%",marginBottom:'30%' }}>
             <Button title="Back" onPress={onPressBack} />
             <Button title="Finish"  onPress={() => handleSubmit()} />
           </View>}

@@ -142,7 +142,7 @@ const PostDetail = ({navigation,route}) =>{
                 </View>
 
             </ScrollView>
-            <FixedButton setcompanion={setcompanion}  companions = {detail.travelCompanion} userPost = {detail.user}  id_post = {place_id}/>
+            <FixedButton setcompanion={setcompanion} navigation = {navigation}  companions = {detail.travelCompanion} userPost = {detail.user}  id_post = {place_id}/>
         </SafeAreaView>
     )
     

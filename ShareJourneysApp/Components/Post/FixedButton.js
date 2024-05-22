@@ -4,8 +4,11 @@ import { COLORS} from '../../constants';
 import { MaterialIcons } from "@expo/vector-icons";
 import APIs, { endpoints } from '../../config/APIs';
 import Mycontext from '../../config/Mycontext';
+import { authentication, db } from '../../firebase/firebaseconf';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { collection, query, where, getDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 
-const FixedButton = ({ setcompanion,userPost,id_post,companions}) => {
+const FixedButton = ({ navigation,setcompanion,userPost,id_post,companions}) => {
     const [visible, setVisible] = useState(false);
     const [del, setDel ] = useState(false);
     const dlUser= useContext(Mycontext)
@@ -42,12 +45,42 @@ const FixedButton = ({ setcompanion,userPost,id_post,companions}) => {
         Alert.alert('Bạn không được xóa')
       }
     }
-    
+    const getCOl = async (querydoc, col ) =>{
+      getDocs(querydoc).then((querySnapshot) => {
+        if (!querySnapshot.empty) { // Kiểm tra xem kết quả truy vấn có tài liệu nào không
+          console.log('cawca',querySnapshot.docs[0].data())
+          const firstDoc = querySnapshot.docs[0]; // Lấy tài liệu đầu tiên từ kết quả truy vấn
+          const firstDocId = firstDoc.id; // Lấy ID của tài liệu đầu tiên
+          const docRef = doc(db,col, firstDoc.id);
+          setDoc(docRef,firstDoc.data())
+          console.log('dfadaw',firstDoc.data())
+          if (col == dlUser[0].username)
+            return navigation.navigate('Chat', {name:firstDoc.username, uid:firstDoc.id})
+
+        } else {
+          console.log("Không có người dùng phù hợp với điều kiện.");
+        }
+      }).catch((error) => {
+        console.error("Lỗi khi lấy thông tin người dùng:", error);
+      });
+    }
+    const chat = async () => {
+      const condition1 = where('username', '==', userPost.username); // Ví dụ: Lọc ra người dùng có userType là 'normal'
+      const condition2 = where('username', '==',dlUser[0].username); // Ví dụ: Lọc ra người dùng có userType là 'normal'
+      const usersCollectionRef = collection(db, userPost.username);
+      const collectionUserPost = query(usersCollectionRef, condition1);
+      const curUser = collection(db, dlUser[0].username);
+      const collectionUserAuth = query(curUser, condition2);
+      await getCOl(collectionUserAuth,userPost.username)
+      await getCOl(collectionUserPost,dlUser[0].username)
+  }
+
+
     return (
       <>
       <View style={styles.fixedButton}>
         <TouchableOpacity
-          onPress={() => console.log('Nhấn nút')}
+          onPress={() => chat()}
         >
           <MaterialIcons  name="wechat" size={40} color={COLORS.black}/>
         </TouchableOpacity>

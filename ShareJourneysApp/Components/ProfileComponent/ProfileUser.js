@@ -56,7 +56,7 @@ const PhotosRoutes = ({navigation,pofile}) => {
             >
               <Image
                 key={index}
-                source={{ uri: posts_current_user[0].pic[1].picture}}
+                source={{ uri: user.pic[0].picture}}
                 style={{ width: "100%", height: "80%", borderRadius: 12 }}
               />                  
               <Text 

@@ -3,7 +3,6 @@ import React, { useContext, useEffect, useState } from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox"
-
 import color from '../../style/color';
 import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import { authentication } from '../../firebase/firebaseconf';
@@ -12,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../../Button';
 import APIs, { authApi, endpoints } from '../../config/APIs';
 import Mycontext from '../../config/Mycontext';
+
 
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState();
@@ -26,11 +26,12 @@ const Login = ({ navigation }) => {
         setLoading(true);
         try {
             console.log(username,password);
+            console.log( process.env.SHAREJOURNEYSAPP_CLIENT_ID)
             let res = await APIs.post(endpoints['login'], {
                 "username": username, 
                 "password": password,
-                "client_id": "67sjlAVhkGvULNaUxEXk6JZZN9EtJUgmMLnXZi1A",
-                "client_secret": "HIFRCdFUWLp26PCREopmegS0NAbQzicYM5Lwfh2khVZE4XEnGdbuzTQO63xQAuIJzejAkbMG9e9xejkZR0QyfQ39kIPc8H0y8MEmIi0EoV0yNo5hIiOGP1GmkUn5SMrA",
+                "client_id": process.env.SHAREJOURNEYSAPP_CLIENT_ID,
+                "client_secret": process.env.SHAREJOURNEYSAPP_CLIENT_SECRET,
                 "grant_type": "password"
             },{
                 headers: { 'Content-Type': 'multipart/form-data' },

@@ -26,12 +26,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
-const Comment =forwardRef(({ id_userPost,hasVisible,setHasVisible,setIdReped,id_P, id_c,reference, index, setIn, comment,bool,setIsCmtRep }, ref) => {
+const Comment =forwardRef(({ id_userPost,setIdReped,id_P, id_c,reference, index, setIn, comment,bool,setIsCmtRep }, ref) => {
   const [selectedReason, setSelectedReason] = useState();
+  const [tick, setTick] = useState();
   const dlUser= useContext(Mycontext)
 
   const handleRep = (id_c) => {
-    
+    console.log('abc')
+    console.log(index)
+    console.log(bool)
+    console.log(id_c)
+
     reference()
     setIn(index)
     setIsCmtRep(bool);
@@ -42,26 +47,31 @@ const Comment =forwardRef(({ id_userPost,hasVisible,setHasVisible,setIdReped,id_
   const AddCommentTick = async (id_userCMT) =>{
     try{
       let res = await APIs.post(endpoints['add-tick'](id_P,id_c),{'idUser': id_userCMT})
-      
+      console.log(res.data)
+      setTick(res.data)
       }
       catch(ex)
       {
         console.error(ex);
       }
   }
-  useEffect(()=>{
-    if(selectedReason !== undefined)
-      setHasVisible(!hasVisible)
-  },[selectedReason])
+
 
   
   const handlePressReason = (reason, id_userCMT) => {
+    console.log('dawdadawdawdddddw',id_userCMT, reason)
+    console.log('dawdadawd',dlUser[0].id)
+    console.log('dawdadawdawdddddw222222222222',id_userPost)
+    console.log('dawdadawdawdddddw333333333333',selectedReason)
+
     if (id_userPost == dlUser[0].id)
     {
       AddCommentTick(id_userCMT)
-      if (selectedReason === reason) {
+      if (selectedReason == reason) {
+        console.log('1')
         setSelectedReason(null);
       } else {
+        console.log('2')
         setSelectedReason(reason);
       }
     }
@@ -83,8 +93,11 @@ const Comment =forwardRef(({ id_userPost,hasVisible,setHasVisible,setIdReped,id_
               <Feather name="message-circle" size={20} color="black" />
             </TouchableOpacity>
 
-            
-            { comment.tick!= undefined && comment.tick.length > 0 && comment.tick[0].active &&
+            {/* {console.log(comment.tick!= undefined )}
+            {console.log( comment.tick.length > 0)}
+            {console.log( comment.tick[0].active)} */}
+            {/* {console.log('cawcaw' ,tick)} */}
+            { tick==undefined? comment.tick!= undefined && comment.tick.length > 0 && comment.tick[0].active &&
             <>
               <View style={{ justifyContent: 'flex-end', width: 40 }}>
                   <MaterialIcons
@@ -93,7 +106,17 @@ const Comment =forwardRef(({ id_userPost,hasVisible,setHasVisible,setIdReped,id_
                             color="green"
                           />
               </View>
-            </>
+            </>:
+            tick.tick[0].active &&
+            <>
+            <View style={{ justifyContent: 'flex-end', width: 40 }}>
+                <MaterialIcons
+                          name="check-circle"
+                          size={24}
+                          color="green"
+                        />
+            </View>
+          </>
             }
           </View>
         </View>
@@ -103,7 +126,7 @@ const Comment =forwardRef(({ id_userPost,hasVisible,setHasVisible,setIdReped,id_
 });
 
 
-const Comments = memo(forwardRef(({id_userPost,hasVisible, setHasVisible,id_P, setIdReped,handleRef, setIn, comments, set, setRep, rep,setIsCmtR }, ref) => {
+const Comments = forwardRef(({id_userPost,id_P, setIdReped,handleRef, setIn, comments, set, setRep, rep,setIsCmtR }, ref) => {
   const [showReplyViews, setShowReplyViews] = useState(Array(comments.length).fill(false));
   const [up, setUp] = useState(90)
   // const [indexState,setIndexState] = useState(0);
@@ -152,7 +175,7 @@ const Comments = memo(forwardRef(({id_userPost,hasVisible, setHasVisible,id_P, s
     <View >
       {comments.map((comment, indexArr) => (
         <View  key={comment.id} style={{ flexDirection: 'column' }}>
-           <Comment ref={ref} id_userPost={id_userPost} hasVisible = {hasVisible} setHasVisible={setHasVisible} setIdReped={setIdReped} id_P = {id_P} id_c = {comment.id} reference={useHandleRefresh} comment={comment} index={indexArr} bool ={true} idCmt = {comment.id} setIsCmtRep={setIsCmtR} setIn={setIn} />
+           <Comment ref={ref} id_userPost={id_userPost}  setIdReped={setIdReped} id_P = {id_P} id_c = {comment.id} reference={useHandleRefresh} comment={comment} index={indexArr} bool ={true} idCmt = {comment.id} setIsCmtRep={setIsCmtR} setIn={setIn} />
           
           {/* nut hien reply */}
           {comment.reply_count != 0 &&
@@ -188,7 +211,7 @@ const Comments = memo(forwardRef(({id_userPost,hasVisible, setHasVisible,id_P, s
       ))}
     </View>
   );
-}));
+});
 
 
 const InputView = forwardRef(({view,setView, id_c,id_P,index,setIn,comments, set,rep, setRep ,iscmtRep,setIsCmtR }, ref) => {
@@ -218,7 +241,10 @@ const InputView = forwardRef(({view,setView, id_c,id_P,index,setIn,comments, set
           'content': newCommentText
       })
 
-      setRep([res.data,...rep]);
+      // setRep([res.data,...rep]);
+      const cm = comments.splice(index, 1,res.data);
+      console.log('123456',cm);
+      set(comments);
       setView(!view);
 
   } catch (ex) {
@@ -264,7 +290,6 @@ const PostComments = ({islocked,id_userPost,id_post, isVisible, onClose }) => {
   const inputRef = useRef();
   const [idCmt, setIdCmt] = useState()// de luu rep
   const [viewCMTRep,setViewCMTRep ] = useState(false);
-  const [hasVisible, setHasVisible] = useState(false);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -289,21 +314,24 @@ const PostComments = ({islocked,id_userPost,id_post, isVisible, onClose }) => {
 
 
   const loadCommentsPost = async () =>{
+    console.log('page',page)
+
     if (page > 0) {
       setLoading(true);
-
+      console.log('k vo day')
     try{
       let res = await APIs.get(`${endpoints['comments'](id_post)}?page=${page}`)
 
+    
       if (res.data.next === null)
         setPage(0);
 
       if (page === 1)
         setComments(res.data.results);
       else
-      setComments(current => {
-          return [...current, ...res.data.results];
-      });
+        setComments(current => {
+            return [...current, ...res.data.results];
+        });
       }
       catch(ex)
       {
@@ -316,8 +344,9 @@ const PostComments = ({islocked,id_userPost,id_post, isVisible, onClose }) => {
   }
 }
   useEffect(()=>{
+    console.log('dawddddddddddddddddddddddddddddddddddddddddddddddddddwoo[pmomopm');
     loadCommentsPost();
-  },[id_post,viewCMTRep,hasVisible,page])
+  },[id_post,viewCMTRep,page])
 
   useEffect(()=>{
     setCmtRep(() => Array(comments.length).fill(null).map(() => []))
@@ -358,7 +387,7 @@ const PostComments = ({islocked,id_userPost,id_post, isVisible, onClose }) => {
         <ScrollView style={{ width: '100%', height: '80%', marginTop: 30 }} onScroll={loadMore}>
         <RefreshControl onRefresh={() => loadCommentsPost()} />
         {loading && <ActivityIndicator />}
-          {comments.length != 0 && <Comments id_userPost={id_userPost} hasVisible={hasVisible}  setHasVisible={setHasVisible}   id_P = {id_post} setIdReped={setIdCmt} handleRef={handleButtonPress}  setIn = {setIndex} comments={comments} rep = {cmtRep} setRep = {setCmtRep} set = {setComments} setIsCmtR = {setIsCmtRep} ref={inputRef} />}
+          {comments.length != 0 && <Comments id_userPost={id_userPost}  id_P = {id_post} setIdReped={setIdCmt} handleRef={handleButtonPress}  setIn = {setIndex} comments={comments} rep = {cmtRep} setRep = {setCmtRep} set = {setComments} setIsCmtR = {setIsCmtRep} ref={inputRef} />}
           {loading && page > 1 && <ActivityIndicator />}
 
         </ScrollView>
