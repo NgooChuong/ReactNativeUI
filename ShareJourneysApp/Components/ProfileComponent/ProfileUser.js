@@ -23,13 +23,53 @@ import {  FontAwesome } from '@expo/vector-icons';
 import APIs, { endpoints } from "../../config/APIs";
 
 
-const PhotosRoutes = ({navigation,pofile}) => {
-  const {username,posts_current_user}  = pofile;
-  console.log('11111111111111111111111111111111111',pofile);
+const PhotosRoutes = ({id,navigation}) => {
+  // const {username,posts_current_user}  = pofile;
+  // console.log('11111111111111111111111111111111111',pofile);
+
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [posts, setPosts] = useState()
+    const loadUserPosts = async() => {
+      if (page > 0) {
+        setLoading(true);
+        try {
+            let url = `${endpoints['post_user'](id)}?page=${page}`;
+            let res = await APIs.get(url);
+            
+            if (res.data.next === null)
+                setPage(0);
+
+            if (page === 1)
+              setPosts(res.data.results);
+            else
+            setPosts(current => {
+                    return [...current, ...res.data.results];
+                });
+        } catch (ex) {
+            console.error(ex);
+        } finally {
+            setLoading(false);
+        }
+    }
+}
+    const isScrollingRight = ({layoutMeasurement, contentOffset,contentSize}) => {
+      return contentOffset.x > 0 && contentOffset.x + layoutMeasurement.width >= contentSize.width;
+    };
+    const loadMore = ({nativeEvent}) => {
+      if (!loading && page > 0 && isScrollingRight(nativeEvent)) {
+              setPage(page + 1);
+      }
+    }
+    useEffect(() => {
+      loadUserPosts()
+    }, [page])
 
   return(
-    <ScrollView style={{ flex: 1, paddingHorizontal: 1 }}horizontal={true} showsHorizontalScrollIndicator={false}>
-    {posts_current_user.map((user, index) => (
+    <ScrollView style={{ flex: 1, paddingHorizontal: 1 }}horizontal={true} showsHorizontalScrollIndicator={false} onScroll={loadMore}>
+            {loading && <ActivityIndicator />}
+
+    { posts != undefined && posts.map((user, index) => (
       <TouchableOpacity style={{ margin: 1, backgroundColor: color.white, padding:3, borderWidth: 1, borderColor: 'black', borderRadius: 10}} key={index}  
       onPress={() => {navigation.navigate('PostDetail2',{'place_id':user.id, "naviName": 'ProfileUser'})}}>
         <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 1 }}>
@@ -72,6 +112,8 @@ const PhotosRoutes = ({navigation,pofile}) => {
             
       </TouchableOpacity>
     ))}
+                          {loading && page > 1 && <ActivityIndicator />}
+
   </ScrollView>
   );
   
@@ -223,7 +265,7 @@ const Profile = ({navigation, route}) => {
       <View style={{ flex: 1, marginHorizontal: 2, marginTop: 1 }}>
         <ScrollView>
           {console.log('pofilelllllllllll',pofile)}
-          {pofile==undefined? <ActivityIndicator/>:<PhotosRoutes navigation={navigation} pofile={pofile} />}
+          {pofile==undefined? <ActivityIndicator/>:<PhotosRoutes id = {id} navigation={navigation} />}
         </ScrollView>
       </View>
       <ReportModal user={pofile.username} id_user = {id} isVisible={isReportModalVisible} onClose={handlePressCloseReportModal} />

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = 'http://192.168.1.14:8000/';
+const BASE_URL = 'http://192.168.1.13:8000/';
 
 export const endpoints = {
     'local': '/local/',
@@ -21,7 +21,10 @@ export const endpoints = {
     'deleteCompanion':  (post_id) => `/posts/${post_id}/travelCompanion/`,
     'report':"/reports/",
     'reportUser': (reportId) => `/reports/${reportId}/userReport/`,
-    'user': (id_user) => `/users/${id_user}/`,
+    'user': (id_user) => `/users/${id_user}/`, // Lấy trang cá nhan ng khác (K phải dang nhap)
+    'post_user': (id_user) => `/users/${id_user}/posts/`,
+    'post_current_user':`/users/current-user/posts/`,
+    'deletePost':(postId) => `/posts/${postId}/`,
     'apiEmail':"/api/send/mail",
     'updatePost': (post_id) => `/posts/${post_id}/updatePost/`,
     'hisPostRegister': "history/hisPostRegister/",

@@ -1,19 +1,56 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet,TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, Image, StyleSheet,TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import color from '../../style/color';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { pofile, userJson } from '../../data/data';
 import moment from 'moment';
 import {  FontAwesome } from '@expo/vector-icons';
-import APIs, { endpoints } from '../../config/APIs';
+import APIs, { authApi, endpoints } from '../../config/APIs';
 import Mycontext from '../../config/Mycontext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
   const { name, posts } = userJson;
 
-  const PhotosRoutes = ({posts,navigation}) => {
-    const {username,posts_current_user}  = posts;
+  const PhotosRoutes = ({setLoading,setPosts,page,loading,loadMore,posts,navigation}) => {
+    const xuLyDeletePost=async(idPost,index)=>{
+      try {
+        let token = await AsyncStorage.getItem('access-token');
+        let res= await authApi(token).delete(endpoints['deletePost'](idPost));
+        if(res.status==204)
+        {
+          Alert.alert("Xóa thành công!!!");
+          let temp = [...posts];
+          temp.splice(index, 1);
+          setPosts(temp);
+        }
+    } catch (ex) {
+        console.error(ex);
+    }
+    }
+
+
+    const deletePost = (idPost,index) => {
+      Alert.alert(
+        "Xóa bài viết",
+        "Bạn có chắc chắn muốn xóa bài viết này?",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel pressed"),
+            style: "cancel"
+          },
+          {
+            text: "OK",
+            onPress: () =>xuLyDeletePost(idPost,index)
+            
+          }
+        ]
+      );
+    };
     return(
-      <ScrollView style={{ flex: 1, paddingHorizontal: 1 }}horizontal={true} showsHorizontalScrollIndicator={false}>
-      {posts_current_user.map((user, index) => (
+      <ScrollView style={{ flex: 1, paddingHorizontal: 1 }}horizontal={true} showsHorizontalScrollIndicator={false} onScroll={loadMore}>
+      {/* {loading && <ActivityIndicator />} */}
+      {console.log('1231313131312',posts)}
+      {posts.map((user, index) => (
         
         <TouchableOpacity style={{ margin: 1, backgroundColor: color.white, padding:3, borderWidth: 1, borderColor: 'black', borderRadius: 10}} key={index} onPress={() => {navigation.navigate('PostDetail',{'place_id':user.id, "naviName": 'PostScreen'})}}>
           <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 1 }}>
@@ -25,7 +62,14 @@ import Mycontext from '../../config/Mycontext';
               <Text style={{ color: 'red', fontWeight: 'bold', fontSize: 14 }}>{user.user.username}</Text>
               <Text style={{ color: 'gray', fontSize: 12 }}>{moment(user.created_date).fromNow()}</Text>
             </View>
-            
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <TouchableOpacity onPress={() => console.log('Edit')}>
+                  <FontAwesome name="pencil" size={20} color={color.primary} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() =>deletePost(user.id,index)}>
+                  <FontAwesome name="trash" size={20} color={color.danger} style={{ marginLeft: 2 }} />
+                </TouchableOpacity>
+              </View>
           </View>
           <View
                 style={{
@@ -58,30 +102,53 @@ import Mycontext from '../../config/Mycontext';
              
         </TouchableOpacity>
       ))}
+                      {loading && page > 1 && <ActivityIndicator />}
     </ScrollView>
     )
     
   };
 const PostScreen = ({navigation}) => {
     const route = useRoute();
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
     const formData = route.params?.formData; // Sử dụng optional chaining để kiểm tra tồn tại của route.params
-    const dlUser= useContext(Mycontext)
     const [posts, setPosts] = useState()
     const loadUserPosts = async() => {
-      try {
-        let res = await APIs.get(endpoints['user'](dlUser[0].id))
-        setPosts(res.data);
+      if (page > 0) {
+        setLoading(true);
+        try {
+            let url = `${endpoints['post_current_user']}?page=${page}`;
+            let token = await AsyncStorage.getItem('access-token')
+            let res = await authApi(token).get(url);
+
+            if (res.data.next === null)
+                setPage(0);
+
+            if (page === 1)
+              setPosts(res.data.results);
+            else
+            setPosts(current => {
+                    return [...current, ...res.data.results];
+                });
         } catch (ex) {
             console.error(ex);
-            return;
+        } finally {
+            setLoading(false);
         }
-  }
+    }
+}
+    const isScrollingRight = ({layoutMeasurement, contentOffset,contentSize}) => {
+      return contentOffset.x > 0 && contentOffset.x + layoutMeasurement.width >= contentSize.width;
+    };
+    const loadMore = ({nativeEvent}) => {
+      if (!loading && page > 0 && isScrollingRight(nativeEvent)) {
+              setPage(page + 1);
+      }
+    }
     useEffect(() => {
       loadUserPosts()
-    }, [formData])
+    }, [formData,page])
     // const navigation = useNavigation();
-
-
 
 
     return (
@@ -100,7 +167,7 @@ const PostScreen = ({navigation}) => {
         </View>
         <View style={{...styles.formContainer,padding:1,marginTop:50}}>
           <Text style={{...styles.text,marginTop:1}}>Các bài viết:</Text>
-          {posts== undefined? <ActivityIndicator/>:<PhotosRoutes posts = {posts} navigation={navigation}></PhotosRoutes>}
+          {posts== undefined? <ActivityIndicator/>:<PhotosRoutes setLoading = {setLoading} setPosts={setPosts} page = {page} loading = {loading} posts = {posts} loadMore = {loadMore} navigation={navigation}></PhotosRoutes>}
         </View>
       </ScrollView>
     );

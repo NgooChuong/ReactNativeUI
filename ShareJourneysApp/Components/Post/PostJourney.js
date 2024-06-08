@@ -95,6 +95,7 @@ const PostJourney = ({Journey,sl_stoplocal})=>{
     const renderButton = (length,data)=>{
         const elements = [];
         var name = ''
+        var ngay = ''
         for (let i = 0; i < length; i++) {
             if(i==0){
                 elements.push
@@ -103,11 +104,14 @@ const PostJourney = ({Journey,sl_stoplocal})=>{
                     <MaterialIcons name="lock-clock" size={30} color={COLORS.black} style={{marginTop:5}} />
                     <View style = {{flexDirection: 'column', justifyContent:'space-around'}}>
                         <Text style ={{fontSize: 15, paddingTop:20, paddingLeft:10, paddingRight:10, paddingBottom:10, fontWeight:'bold'}}>
-                            {moment(data.id_tuyenDuong.ngayDi).format("DD/MM/YYYY")}
+                            {
+                                moment(data.ngayDi).format("DD/MM/YYYY")
+                            
+                            }
 
                         </Text>
                         <Text style ={{fontSize: 15, padding:10, fontWeight:'bold'}}>
-                            {moment(data.id_tuyenDuong.ngayDi).format("HH:mm:ss")}
+                            {moment(data.ngayDi).format("HH:mm:ss")}
 
                         </Text>
                     </View>
@@ -126,11 +130,11 @@ const PostJourney = ({Journey,sl_stoplocal})=>{
                     <MaterialIcons name="lock-clock" size={30} color={COLORS.black} style={{marginTop:5}} />
                     <View style = {{flexDirection: 'column', justifyContent:'space-around'}}>
                         <Text style ={{fontSize: 15, paddingTop:20, paddingLeft:10, paddingRight:10, paddingBottom:10, fontWeight:'bold'}}>
-                            {moment(data.id_tuyenDuong.ngayDen).format("DD/MM/YYYY")}
+                            {moment(data.ngayDen).format("DD/MM/YYYY")}
 
                         </Text>
                         <Text style ={{fontSize: 15, padding:10, fontWeight:'bold'}}>
-                            {moment(data.id_tuyenDuong.ngayDen).format("HH:mm:ss")}
+                            {moment(data.ngayDen).format("HH:mm:ss")}
 
                         </Text>
                     </View>

@@ -60,6 +60,7 @@ const ScreenHeader = ({navigation,fil,q}) => {
     try {
         let url = `${endpoints['allposts']}?q=${q}&c=${fil.id_localcome}&a=${fil.id_localarrive}&t=${fil.id_tag}&ti=${fil.time}&r=${fil.id_check}`;
         let res = await APIs.get(url);
+        console.log('co bai post 64 k',res.data);
         setSortPosts(res.data.sort((a,b) => b.avgRate - a.avgRate ));
     } catch(ex) {
         console.error(ex);
