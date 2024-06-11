@@ -17,7 +17,8 @@ import {
 import Mycontext from "../../config/Mycontext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../config/APIs";
-import { v4 as uuidv4 } from 'uuid';
+import { collection, query, where, getDocs ,setDoc} from 'firebase/firestore';
+import { authentication, db } from '../../firebase/firebaseconf'
 
   const EditProfile = ({ navigation }) => {
     const dlUser= useContext(Mycontext)
@@ -27,8 +28,96 @@ import { v4 as uuidv4 } from 'uuid';
     // const [password, setPassword] = useState("");
     const [first_name, setFirstName] = useState(dlUser[0].firstname);
     const [last_name, setLastName] = useState(dlUser[0].lastname);
+    const [loading, setLoading] = useState(false);
+    const changeFireStoreAuthenticate = async (user) => {
+      try {
+        const docsRef = collection(db, dlUser[0].username);
+        const q = query(docsRef, where('userUID', '==', authentication?.currentUser?.uid));
+        
+        // Thực hiện truy vấn để lấy các tài liệu phù hợp
+        const querySnapshot = await getDocs(q);
+    
+        // Lấy avatar từ các tài liệu
+        console.log('docs',querySnapshot.docs)
+        if (!querySnapshot.empty) {
+          // Giả sử chỉ có một tài liệu khớp với userUID
+          const docRef = querySnapshot.docs[0].ref;
+          console.log('docRef1',docRef)
+          // Cập nhật tài liệu với dữ liệu mới
+          await setDoc(docRef, {
+            avatarUrl: user.avatar,
+            username: user.username,
+            userUID: authentication?.currentUser?.uid,
+          }, { merge: true });
+          console.log('Document successfully updated');
+        }    
 
-  
+
+        // const users = querySnapshot.docs.map(doc => ({
+        //   id: doc.id,
+        //   ...doc.data(),
+        // }));
+      //   setDoc(querySnapshot.docs[0], {
+      //     avatarUrl:user.avatar,
+      //     username:user.username,
+      //     userUID:users[0].userUID,
+      // })
+
+
+
+        // console.log('Users:', users);
+        // const avatars = users.map(user => user.avatarUrl); // Giả sử trường avatar trong tài liệu là 'avatar'
+        
+        // console.log('Avatars:', avatars);
+        // return avatars;
+      } catch (error) {
+        console.error('Error update documents: ', error);
+      }
+    };
+    const changeFireStoreNotAuthenticate = async (user) =>{
+      try {
+        console.log("changeFireStoreNotAuthenticate")
+        const docsRef = collection(db, dlUser[0].username);
+        const qN = query(docsRef, where('userUID', '!=', authentication?.currentUser?.uid));
+        console.log('qN',qN.filters)
+        console.log('qN filters', qN._query.filters);
+        console.log('qN filters', qN.segments);
+
+        // Thực hiện truy vấn để lấy các tài liệu phù hợp
+        const querySnapshot = await getDocs(qN); // lay nhung thg nhắn
+        console.log('querySnapshot',querySnapshot.docs)
+
+        // Lấy doc của những thg nhắn của current-user
+        querySnapshot.docs.map(async (doc) => {
+          console.log('dataaaaaaaaaaaaaaaaaaaaaaaa',doc.data())
+          const docsRef = collection(db, doc.data().username);
+          console.log('docRef2',docsRef)
+          const q = query(docsRef, where('userUID', '==',authentication?.currentUser?.uid));
+          const NotAuthquerySnapshot = await getDocs(q);
+          console.log('notAuthQuerySnapshot',NotAuthquerySnapshot.docs);
+          NotAuthquerySnapshot.docs.map(async (docNot) => {
+            if (!NotAuthquerySnapshot.empty) {
+              const docRef = docNot.ref;
+              // Cập nhật tài liệu với dữ liệu mới
+              console.log('11111111',docRef)
+              await setDoc(docRef, {
+                avatarUrl: user.avatar,
+                username: user.username,
+                userUID: authentication?.currentUser?.uid,
+              }, { merge: true });
+              console.log('Document successfully updated');
+            }    
+          })
+          
+      })
+        
+
+    }
+     catch (error) {
+        console.error('Error update documents: ', error);
+      }
+    }
+
     const patch_user = async () => {
       
       let userData = {
@@ -58,12 +147,19 @@ import { v4 as uuidv4 } from 'uuid';
             headers: {
               'Content-Type': 'multipart/form-data'
             }
-          
           });
-
+          console.log('1231313123123',user.data)
+          dlUser[1]({
+            type: "editProfile",
+            payload: user.data
+            
+          })
+          await changeFireStoreAuthenticate(user.data)   
+          await changeFireStoreNotAuthenticate(user.data) 
+          navigation.goBack();   
       } catch (ex) {
           console.error(ex);
-          Alert.alert("Tai khoan bi khoa hoac chua dang ki nguoi dung");
+          alert("Tai khoan bi khoa hoac chua dang ki nguoi dung");
       } finally {
           setLoading(false);
       }

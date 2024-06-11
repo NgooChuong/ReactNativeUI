@@ -90,7 +90,6 @@ const Signup = ({ navigation }) => {
         console.log("firese1")
         await createUserWithEmailAndPassword(authentication, username, password)
         .then( (userCredentials) => {
-            console.log("firese1")
             const userUID = userCredentials.user.uid;
             collection(db, username);
             const docRef = doc(db, username, userUID);
@@ -127,7 +126,7 @@ const Signup = ({ navigation }) => {
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: color.white }}>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <KeyboardAvoidingView  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <View style={{ flex: 1, marginHorizontal: 10 }}>
                 <View style={{ marginVertical:10 }}>
                     <Text style={{
@@ -318,6 +317,7 @@ const Signup = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
+                
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-start", marginBottom: 5 }}>
                     <TouchableOpacity style={{ backgroundColor: "blue", padding: 10, alignItems: "center", borderRadius: 5}} onPress={picker}>
                     <Text style={{color: "white"}}>Chọn ảnh đại diện</Text>

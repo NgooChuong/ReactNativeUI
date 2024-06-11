@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons'; // Bạn cần cài đặt thư v
 
 const Chat = ({route, navigation}) => {
   const [messages, setMessages] = useState([]);
-  console.log(route.params)
+  console.log('ben chat',route.params)
   const  uid  = route.params.uid
   const  username  = route.params.name
   const  avatar  = route.params.avatar

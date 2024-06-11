@@ -7,7 +7,11 @@ import PostScreen from './PostScreen';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import APIs, { authApi, endpoints } from '../../config/APIs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const SecondPage = ({ formData, onChangeText, onPressBack, onPressNext }) => {
+import moment from 'moment';
+var tam=0;
+
+
+const SecondPage = ({ setScroll,formData, onChangeText, onPressBack, onPressNext }) => {
   const [startingDestination, setStartingDestination] = useState(null);
   const [endingDestination, setEndingDestination] = useState(null);
   const [showDestinationPicker, setShowDestinationPicker] = useState(false);
@@ -76,8 +80,8 @@ const loadDestination= async () => {
     setDatePickerNgayDenVisibility(true);
 
   };
-  const showDateNgayDenTGPicker = (i) => {
-    setDatePickerNgayDenTGVisibility(i,true);
+  const showDateNgayDenTGPicker = () => {
+    setDatePickerNgayDenTGVisibility(true);
 
   };
   const hideDateNgayDiPicker = () => {
@@ -101,18 +105,10 @@ const loadDestination= async () => {
     setDateNgayDen(dateNgayDen);
     hideDateNgayDenPicker();
   };
-  const handleConfirmNgayDenTrungGian = (dateNgayDenTG, i, index) => {
+  const handleConfirmNgayDenTrungGian = (dateNgayDenTG, i) => {
     console.log("vao tg");
     console.log(i);
-    if(demAdd>1)
-    {
-      console.log("vo if");
-      i=demAdd-1;
-      console.log(i);
-    }
-    else{
-      i=0;
-    }
+   
     console.log(dateNgayDenTG)
     setDateNgayDenTrungGian(new Map(dateNgayDenTrungGian.set(i, dateNgayDenTG)));
     setTimeDung(prevTimeDung => {
@@ -228,6 +224,27 @@ const handleDestinationChange = (value, index) => {
     const newDiaDiemTrungGian = [...formData.diaDiemTrungGian];
     console.log("Du lieu submit diem trung gian",selectedDestinations)
     console.log("dad",timeDung);
+    
+    // Phần chỉnh sửa check ngày
+    if(moment(dateNgayDen).isBefore(moment(dateNgayDi))) {
+      alert("Lỗi ngày đi hoặc ngày đến không hợp lệ");
+        return ;
+    }
+    for (let i = 1; i < timeDung.length; i++) {
+      console.log("sos sanh ",moment(timeDung[i - 1]).fromNow())
+      if (moment(timeDung[i - 1]).isAfter(moment(timeDung[i]))) {
+       alert(`Lỗi địa điểm trung gian ${i} và ${i+1}:\n
+        Ngày ${moment(timeDung[i - 1]).format("DD/MM/YYYY hh:mm:ss")} \n
+        không được nhỏ hơn \n
+        Ngày ${moment(timeDung[i]).format("DD/MM/YYYY hh:mm:ss")}\n`);
+       return;
+      }
+    }
+    if (timeDung.length>0 && (moment(dateNgayDen).isBefore(moment(timeDung[timeDung.length - 1])) || 
+      moment(dateNgayDi).isAfter(moment(timeDung[0])))) {
+        alert("Lỗi ngày đi hoặc ngày đến không hợp lệ hoặc ngày trung gian không hợp lệ");
+        return ;
+      }
     selectedDestinations.forEach((destination, index) => {
       if (index >= newDiaDiemTrungGian.length) {
         newDiaDiemTrungGian.push({ iddiaDiem: destination.id, timedung: timeDung[index] });
@@ -418,8 +435,8 @@ const handleDestinationChange = (value, index) => {
           </View>
           <View>
           {showDestinationPicker &&
-            Array.from({ length: demAdd }, (_, i) => (
-              <View key={i} style={styles.intermediateDestinationsPickerContainer}>
+            Array(demAdd).fill(2).map((_, i) => (
+                <View key={i} style={styles.intermediateDestinationsPickerContainer}>
                 <View style={{ borderWidth: 1, margin: 5, borderRadius: 10 }}>
                   <View style={{ flexDirection: 'row', padding: 1 }}>
                     <Text style={styles.headerText}>Chọn hành trình trung gian</Text>
@@ -445,7 +462,7 @@ const handleDestinationChange = (value, index) => {
                     </Picker>
                     <View>
                         <View style={{flexDirection:"row"}}>
-                        <TouchableOpacity style={{...styles.iconButton, width: 210,flexDirection:"row"}}  onPress={(i)=>showDateNgayDenTGPicker(i)}>
+                        <TouchableOpacity style={{...styles.iconButton, width: 210,flexDirection:"row"}}  onPress={()=>{tam=i,showDateNgayDenTGPicker()}}>
                         <FontAwesome name="calendar" size={24} color="black" />
                         <Text>Chọn thời gian dự kiến đến</Text>
                         </TouchableOpacity>
@@ -453,9 +470,10 @@ const handleDestinationChange = (value, index) => {
                         <DateTimePicker 
                           isVisible={isDatePickerNgayDenTGVisible}
                             mode="datetime"
-                            onConfirm={(date)=>handleConfirmNgayDenTrungGian(date,i,i)}
-                            onCancel={hideDateNgayDenPicker}
-                            date={dateNgayDenTrungGian.get(i)}
+                            onConfirm={(date)=>{
+                              handleConfirmNgayDenTrungGian(date,tam)}}                           
+                               onCancel={hideDateNgayDenPicker}
+                            date={dateNgayDenTrungGian.get(tam)}
                           />
                     
                                   <Text style={{ color: 'red' }} key={i}>

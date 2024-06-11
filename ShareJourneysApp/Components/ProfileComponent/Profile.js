@@ -18,16 +18,16 @@ import Mycontext from "../../config/Mycontext";
   
   const Profile = ({navigation}) => { 
     const dlUser= useContext(Mycontext)
-
     const ToEditProfile = () =>{
         navigation.navigate('EditProfile');
     }
     const logout = () => {
       dlUser[1]({
           "type": "logout",
-          "payload": navigation.navigate('Login')
+          "payload": navigation.navigate('Authenticate')
       })
     }
+    
 
     return (
       <SafeAreaView

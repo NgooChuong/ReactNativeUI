@@ -41,7 +41,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
           {
             text: "OK",
             onPress: () =>xuLyDeletePost(idPost,index)
-            
+ 
           }
         ]
       );
@@ -62,11 +62,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
               <Text style={{ color: 'red', fontWeight: 'bold', fontSize: 14 }}>{user.user.username}</Text>
               <Text style={{ color: 'gray', fontSize: 12 }}>{moment(user.created_date).fromNow()}</Text>
             </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                <TouchableOpacity onPress={() => console.log('Edit')}>
+            <View style={{ flexDirection: 'row',flex:1,justifyContent: 'flex-end' }}>
+                <TouchableOpacity style = {{padding:5}} onPress={() => console.log('Edit')}>
                   <FontAwesome name="pencil" size={20} color={color.primary} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() =>deletePost(user.id,index)}>
+
+                <TouchableOpacity style = {{padding:5}} onPress={() =>deletePost(user.id,index)}>
                   <FontAwesome name="trash" size={20} color={color.danger} style={{ marginLeft: 2 }} />
                 </TouchableOpacity>
               </View>
@@ -107,20 +108,40 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
     )
     
   };
+
+  var temp2 = true;
 const PostScreen = ({navigation}) => {
     const route = useRoute();
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
-    const formData = route.params?.formData; // Sử dụng optional chaining để kiểm tra tồn tại của route.params
+    const formData = route.params?.formData;
+    // Sử dụng optional chaining để kiểm tra tồn tại của route.params
     const [posts, setPosts] = useState()
+
+    const getEndpoint = async(page)=>{
+        let url = `${endpoints['post_current_user']}?page=${page}`;
+        let token = await AsyncStorage.getItem('access-token')
+        let res = await authApi(token).get(url)
+        return res;
+    }
     const loadUserPosts = async() => {
+      if (formData!=undefined && temp2==true) {
+        console.log('111111111111111111111111111111111111111111111111111111111111111111111')
+        let res = await getEndpoint(1);
+        setPage(1)
+        temp2=false;
+      
+      console.log('dawdadawdadwawdawdawdadadwawdwdadawdawdawdawdadawdw')
+        setPosts(res.data.results);
+        return;
+      }
+
       if (page > 0) {
+        console.log('pageeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',page)
         setLoading(true);
         try {
-            let url = `${endpoints['post_current_user']}?page=${page}`;
-            let token = await AsyncStorage.getItem('access-token')
-            let res = await authApi(token).get(url);
-
+          
+            let res = await getEndpoint(page);
             if (res.data.next === null)
                 setPage(0);
 
@@ -136,6 +157,7 @@ const PostScreen = ({navigation}) => {
             setLoading(false);
         }
     }
+    
 }
     const isScrollingRight = ({layoutMeasurement, contentOffset,contentSize}) => {
       return contentOffset.x > 0 && contentOffset.x + layoutMeasurement.width >= contentSize.width;
@@ -146,7 +168,9 @@ const PostScreen = ({navigation}) => {
       }
     }
     useEffect(() => {
+      console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
       loadUserPosts()
+      
     }, [formData,page])
     // const navigation = useNavigation();
 
@@ -161,7 +185,7 @@ const PostScreen = ({navigation}) => {
           <Text style={styles.text}>sharejourney</Text>
         </View>
         <View style={styles.formContainer}>
-          <TouchableOpacity style={styles.submitButton} onPress={()=>navigation.navigate("PostForm")}>
+          <TouchableOpacity style={styles.submitButton} onPress={()=>{temp2 = true, navigation.navigate("PostForm")}}>
             <Text style={styles.submitButtonText}>Bạn muốn share hành trình</Text>
           </TouchableOpacity>
         </View>

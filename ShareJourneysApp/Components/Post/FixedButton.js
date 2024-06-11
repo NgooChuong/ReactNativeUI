@@ -48,6 +48,8 @@ const FixedButton = ({ navigation,setcompanion,userPost,id_post,companions}) => 
     const getCOl = async (querydoc, col ) =>{
       getDocs(querydoc).then((querySnapshot) => {
         if (!querySnapshot.empty) { // Kiểm tra xem kết quả truy vấn có tài liệu nào không
+          console.log('cawca',querySnapshot.docs[0])
+          
           console.log('cawca',querySnapshot.docs[0].data())
           const firstDoc = querySnapshot.docs[0]; // Lấy tài liệu đầu tiên từ kết quả truy vấn
           const firstDocId = firstDoc.id; // Lấy ID của tài liệu đầu tiên
@@ -55,7 +57,12 @@ const FixedButton = ({ navigation,setcompanion,userPost,id_post,companions}) => 
           setDoc(docRef,firstDoc.data())
           console.log('dfadaw',firstDoc.data())
           if (col == dlUser[0].username)
-            return navigation.navigate('Chat', {name:firstDoc.username, uid:firstDoc.id})
+            return navigation.navigate('Chat', {
+              avatar: dlUser[0].avatar,
+              name:dlUser[0].username, uid:firstDoc.id,
+              username:firstDoc.data().username,
+              avatarRec:firstDoc.data().avatarUrl,
+            })
 
         } else {
           console.log("Không có người dùng phù hợp với điều kiện.");

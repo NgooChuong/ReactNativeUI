@@ -60,7 +60,7 @@ const BottomTabNav = () => {
         />
         
       <Tab.Screen
-          name="Chat"
+          name="ChatUser"
           component={ChatNavigate}
           options={{
             tabBarIcon: ({ focused }) => {
@@ -91,7 +91,7 @@ const BottomTabNav = () => {
           }}
         />
         <Tab.Screen
-          name="Profile"
+          name="ProfileUser"
           component={ProfileNavigate}
           options={{
             tabBarIcon: ({ focused }) => {
@@ -106,7 +106,7 @@ const BottomTabNav = () => {
           }}
         />
         <Tab.Screen
-          name="History"
+          name="HistoryPost"
           component={HistoryNavigate}
           options={{
             tabBarIcon: ({ focused }) => {

@@ -38,7 +38,8 @@ const Home = ({ navigation }) => {
           onPress={() => navigation.navigate('Chat', 
                   {
                   name:dlUser[0].username, 
-                  uid:item.userUID,avatarRec:item.avatarUrl ,
+                  uid:item.userUID,
+                  avatarRec:item.avatarUrl ,
                   avatar: dlUser[0].avatar,
                   username: item.username,
                 }

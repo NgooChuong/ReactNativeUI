@@ -8,8 +8,8 @@ const Stack = createNativeStackNavigator();
 
 const MainNavigate = () => {
   return (
-            <Stack.Navigator initialRouteName ="Login">
-                <Stack.Screen name="Login"  options={{headerShown: false}} component={LoginNavigation} />
+            <Stack.Navigator initialRouteName ="Authenticate">
+                <Stack.Screen name="Authenticate"  options={{headerShown: false}} component={LoginNavigation} />
                 <Stack.Screen name="BottomTabNav" options={{headerShown: false}} component={BottomTabNav} />
             </Stack.Navigator>
 

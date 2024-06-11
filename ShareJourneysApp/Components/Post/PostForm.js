@@ -8,7 +8,6 @@ import SecondPage from './SecondPage';
 const PostForm = () => {
   const navigation = useNavigation();
   const [page, setPage] = useState(0);
-
   const [formData, setFormData] = useState({
     title: '',
     content:'',
@@ -51,10 +50,11 @@ const PostForm = () => {
       case 0:
         return <FirstPage formData={formData} onChangeText={handleChangeText} onPressNext={handlePressNext} />;
       case 1:
-        return <SecondPage formData={formData} onChangeText={handleChangeText} onPressBack={handlePressBack} onPressNext={handlePressNext} />;
+        return <SecondPage  formData={formData} onChangeText={handleChangeText} onPressBack={handlePressBack} onPressNext={handlePressNext} />;
       case 2:
-        return navigation.navigate("PostScreen",{formData: formData})
-      // default:
+         navigation.navigate("PostScreen",{formData: formData})
+         return null;
+         // default:
       //   return <PostScreen formData={formData} />;
     }
   };

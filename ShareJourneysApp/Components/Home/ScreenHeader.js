@@ -85,7 +85,6 @@ const isCloseToTop = ({layoutMeasurement, contentOffset, contentSize}) => {
   return contentOffset.y <= paddingToTop;
 };
 const loadMore = ({nativeEvent}) => {
-  console.log('123')
   if ( isCloseToTop(nativeEvent)) {
     console.log('acn')
           setRefreshing(!refreshing);
