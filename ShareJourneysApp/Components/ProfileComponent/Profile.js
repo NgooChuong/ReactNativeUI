@@ -12,6 +12,8 @@ import {
   import { StatusBar } from "expo-status-bar";
   import { MaterialIcons } from "@expo/vector-icons";
 import Mycontext from "../../config/Mycontext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { deleteDevide } from '../Notification/Notification';
 
 
 
@@ -21,7 +23,10 @@ import Mycontext from "../../config/Mycontext";
     const ToEditProfile = () =>{
         navigation.navigate('EditProfile');
     }
-    const logout = () => {
+    const logout = async () => {
+      const token_device = await AsyncStorage.getItem('token_device')
+      console.log(token_device)
+      await deleteDevide(token_device,dlUser);
       dlUser[1]({
           "type": "logout",
           "payload": navigation.navigate('Authenticate')

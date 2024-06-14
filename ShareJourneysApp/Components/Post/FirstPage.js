@@ -6,14 +6,12 @@ import Button from '../../Button';
 import color from '../../style/color';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import APIs, { endpoints } from '../../config/APIs';
-const ImageList = ({ page,  loadPicture, loading, images, onSelect,loadMore }) => {
+export const ImageList = ({ page,  loadPicture, loading, images, onSelect,loadMore }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [imageSelections, setImageSelections] = useState({});
-  console.log('iamge nbe',images);
   const handleImageSelection = (image) => {
     const updatedSelections = { ...imageSelections };
     console.log("ham moi")
-    console.log(image)
     updatedSelections[image.id] = !updatedSelections[image.id];
 
     if (updatedSelections[image.id]) {
@@ -39,9 +37,7 @@ const ImageList = ({ page,  loadPicture, loading, images, onSelect,loadMore }) =
             
             <TouchableOpacity key={index} onPress={() => handleImageSelection(image)}>
               
-              <View style={{ position: 'relative', padding: 1, borderColor: color.primary, borderRadius: 2, borderWidth: 3, margin: 1 }}>
-                {console.log(image.picture)}
-                
+              <View style={{ position: 'relative', padding: 1, borderColor: color.primary, borderRadius: 2, borderWidth: 3, margin: 1 }}>                
                 <Image source={{ uri: image.picture }} style={{ width: 100, height: 100 }} />
                 {imageSelections[image.id] && <MaterialIcons name="check-circle" size={24} color="green" style={{ position: 'absolute', top: 0, right: 0 }} />}
               </View>
@@ -67,7 +63,6 @@ const FirstPage = ({ formData, onChangeText, onPressNext }) => {
       setLoading(true);
     try {
         let res = await APIs.get(`${endpoints['picture']}?page=${page}`);
-        console.log('Hinh ne',res.data);
         if (res.data.next === null){
           setPage(0);
           console.log('1')
@@ -133,8 +128,12 @@ const loadMore = ({nativeEvent}) => {
             console.log(selectedPictures)
            //formData.pictureDaChon.push(...selectedImages); // Update the formData object with multiple selected images
             formData.pictureUserSelect.push(...selectedPictures)
-            formData.anhTam.push(...selectedImages)
-            //setPictureDaChon(...selectedImages)
+            formData.anhTam.push({
+              id: "device",
+              picture:selectedImages[0],
+            })
+            console.log('', formData.anhTam)
+            setPictureDaChon([...formData.anhTam])
           }
     }
 };
@@ -146,7 +145,12 @@ const loadMore = ({nativeEvent}) => {
     {
       console.log("oke len")
       formData.pictureDaChon.push(image.id)
-      formData.anhTam.push(image.picture)
+      formData.anhTam.push(
+        {
+          id: image.id,
+          picture:image.picture
+        }
+      )
       
       
     }
@@ -156,27 +160,27 @@ const loadMore = ({nativeEvent}) => {
       formData.pictureDaChon.map(picture=>{
         if (!formData.pictureDaChon.includes(image.id)) {
           formData.pictureDaChon.push(image.id); // Update the formData object directly
-          formData.anhTam.push(image.picture)
+          formData.anhTam.push( {
+            id: image.id,
+            picture:image.picture
+          })
   
         }
       })
     }
     const add= [...formData.anhTam]
-    
+    console.log('adddddd',add)
     setPictureDaChon(add)
-    console.log(selected);
-    console.log("rthem dl");
-    console.log(formData.anhTam);
     onChangeText(formData); // Pass the updated formData object to the onChangeText function
-    console.log(formData)
   };
   const handlePressChooseImgFromLibary= () => {
     setShowImagePicker(!showImagePicker);
   };
   const handleUnselectImage = (index) => {
-  console.log(pictureDaChon)
   //console.log(selected);
    console.log(index)
+   console.log('pictureDaChon',pictureDaChon)
+   
     const updatedImages = [...pictureDaChon];
    // const updateHT= [...selected]
     console.log("truoc khi update",updatedImages);
@@ -191,19 +195,40 @@ const loadMore = ({nativeEvent}) => {
     if(formData.anhTam.length==0)
     {
       formData.pictureDaChon=[];
+      formData.pictureUserSelect=[]
       return;
     }
-    for (const anh of formData.anhTam) {
-        for (const image of imagesDataURL) {
-            console.log("anh tu anh tam:",anh);
-            if (anh === image.name) {
-                console.log("vo duoc xoa anh thu 1")
-                formData.pictureDaChon=[];
-                console.log(formData.pictureDaChon);
-                formData.pictureDaChon.push(image.id);
-            }
-        }
-    }
+    // pic da chon: tu he thong
+    console.log('formData.pictureUserSelect11111111',formData.pictureUserSelect)
+    console.log('formData.pictureDaChon111111111111',formData.pictureDaChon);
+    formData.pictureDaChon = formData.anhTam.filter(image => image.id != "device").map(image => image.id);
+    const selectedPictures = formData.anhTam
+    .filter(image => image.id == "device")
+
+    const filteredPictures = formData.pictureUserSelect.filter(picture => 
+      selectedPictures.some(selected => selected.picture === picture.uri)
+  );
+    // .map(image => {
+    //   formData.pictureUserSelect.some(pic => pic.uri == image.picture);
+    // })
+    formData.pictureUserSelect= filteredPictures
+    console.log('selectedPictures',filteredPictures)
+
+
+    // console.log('formData.pictureUserSelect',formData.pictureUserSelect)
+    // console.log('formData.pictureDaChon',formData.pictureDaChon);
+
+      //  for (const anh of formData.anhTam) {
+      //   for (const image of formData.pictureUserSelect) {
+      //       console.log("anh tu anh tam:",anh);
+      //       if (anh.picture == image.uri) {
+      //           console.log("vo duoc xoa anh thu 1")
+      //           formData.pictureUserSelect=[];
+      //           formData.pictureUserSelect.push(image);
+      //       }
+      //   }
+
+    
    
 
   };
@@ -250,7 +275,8 @@ const loadMore = ({nativeEvent}) => {
         {formData.anhTam.map((image, index) => (
           <TouchableOpacity key={index} onPress={() => handleUnselectImage(index)}>
             <View style={{ position: 'relative',padding:5,marginTop:-5}}>
-            <Image source={{ uri: image }} style={{ width: 80, height: 50, marginRight: 0 }} />
+            
+            <Image source={{ uri: image.picture }} style={{ width: 80, height: 50, marginRight: 0 }} />
             <MaterialIcons name="close" size={20} color="red" style={{ position: 'absolute', top: 0,left:1}} />
           </View>
         </TouchableOpacity>
@@ -261,7 +287,7 @@ const loadMore = ({nativeEvent}) => {
   );
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     padding: 1,
     marginTop:5

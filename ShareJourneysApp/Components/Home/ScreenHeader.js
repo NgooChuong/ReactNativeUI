@@ -8,6 +8,9 @@ import PostDetail from '../Post/PostDetail';
 import APIs, { endpoints } from '../../config/APIs';
 import moment from 'moment';
 import "moment/locale/vi"
+import Notification from '../Notification/Notification';
+import registerNNPushToken from 'native-notify';
+
 
 const ScreenHeader = ({navigation,fil,q}) => {
   // const users = [
@@ -33,7 +36,7 @@ const ScreenHeader = ({navigation,fil,q}) => {
   // const [posts, setPosts] = useState([]); 
   // // Sắp xếp mảng theo tuổi giảm dần
   // const sortedUsers = users.sort((a, b) => b.age - a.age);
-
+  Notification()
   const ToPostDetail = (id) =>{
     navigation.navigate('PostDetail',{"place_id": id,"naviName": 'HomePage'})
   }
@@ -60,7 +63,6 @@ const ScreenHeader = ({navigation,fil,q}) => {
     try {
         let url = `${endpoints['allposts']}?q=${q}&c=${fil.id_localcome}&a=${fil.id_localarrive}&t=${fil.id_tag}&ti=${fil.time}&r=${fil.id_check}`;
         let res = await APIs.get(url);
-        console.log('co bai post 64 k',res.data);
         setSortPosts(res.data.sort((a,b) => b.avgRate - a.avgRate ));
     } catch(ex) {
         console.error(ex);

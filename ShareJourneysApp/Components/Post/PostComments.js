@@ -20,13 +20,13 @@ import reply from '../../data/cmtRep';
 import APIs, { authApi, endpoints } from '../../config/APIs';
 import Mycontext from '../../config/Mycontext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { sendNotification } from '../Notification/Notification';
 
 
 
 
 
-
-const Comment =forwardRef(({ ngaydi,id_userPost,setIdReped,id_P, id_c,reference, index, setIn, comment,bool,setIsCmtRep }, ref) => {
+const Comment =forwardRef(({ title ,ngaydi,id_userPost,setIdReped,id_P, id_c,reference, index, setIn, comment,bool,setIsCmtRep }, ref) => {
   const [selectedReason, setSelectedReason] = useState();
   const [tick, setTick] = useState();
   const dlUser= useContext(Mycontext)
@@ -47,9 +47,15 @@ const Comment =forwardRef(({ ngaydi,id_userPost,setIdReped,id_P, id_c,reference,
   const AddCommentTick = async (id_userCMT) =>{
     try{
       let res = await APIs.post(endpoints['add-tick'](id_P,id_c),{'idUser': id_userCMT})
-      console.log(res.data)
+      console.log('TIcklkkkkkkkkkkkkkkkkkkkkkkkkk',res.data)
       setTick(res.data)
+      if (res.data.tick[0].active == true) {
+        sendNotification(`Bạn được mời đi chung hành trình ${title}`,res.data.user.username)
       }
+      else {
+        sendNotification(`Bạn bị hủy hành trình ${title}` ,res.data.user.username)
+      }
+    }
       catch(ex)
       {
         console.error(ex);
@@ -88,7 +94,6 @@ const Comment =forwardRef(({ ngaydi,id_userPost,setIdReped,id_P, id_c,reference,
   return (
     <TouchableOpacity disabled={checkDisabledButon()}  onPress={() => handlePressReason(index, comment.user.id)}>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-      
       <Image source={{ uri:  comment.user.avatar }} style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }} />
 
         <View style={{ flex: 1, width: 'auto', backgroundColor: 'lightgray', borderStyle: 'solid', borderWidth: 1, borderRadius: 20, padding: 10 }}>
@@ -135,7 +140,7 @@ const Comment =forwardRef(({ ngaydi,id_userPost,setIdReped,id_P, id_c,reference,
 });
 
 
-const Comments = forwardRef(({ngaydi,id_userPost,id_P, setIdReped,handleRef, setIn, comments, set, setRep, rep,setIsCmtR }, ref) => {
+const Comments = forwardRef(({title ,ngaydi,id_userPost,id_P, setIdReped,handleRef, setIn, comments, set, setRep, rep,setIsCmtR }, ref) => {
   const [showReplyViews, setShowReplyViews] = useState(Array(comments.length).fill(false));
   const [up, setUp] = useState(90)
   // const [indexState,setIndexState] = useState(0);
@@ -184,7 +189,7 @@ const Comments = forwardRef(({ngaydi,id_userPost,id_P, setIdReped,handleRef, set
     <View >
       {comments.map((comment, indexArr) => (
         <View  key={comment.id} style={{ flexDirection: 'column' }}>
-           <Comment ngaydi={ngaydi} ref={ref} id_userPost={id_userPost}  setIdReped={setIdReped} id_P = {id_P} id_c = {comment.id} reference={useHandleRefresh} comment={comment} index={indexArr} bool ={true} idCmt = {comment.id} setIsCmtRep={setIsCmtR} setIn={setIn} />
+           <Comment  title={title} ngaydi={ngaydi} ref={ref} id_userPost={id_userPost}  setIdReped={setIdReped} id_P = {id_P} id_c = {comment.id} reference={useHandleRefresh} comment={comment} index={indexArr} bool ={true} idCmt = {comment.id} setIsCmtRep={setIsCmtR} setIn={setIn} />
           
           {/* nut hien reply */}
           {comment.reply_count != 0 &&
@@ -291,7 +296,7 @@ const InputView = forwardRef(({view,setView, id_c,id_P,index,setIn,comments, set
 });
 
 
-const PostComments = ({ngaydi,islocked,id_userPost,id_post, isVisible, onClose }) => {
+const PostComments = ({title,ngaydi,islocked,id_userPost,id_post, isVisible, onClose }) => {
   const [comments, setComments] = useState([]);
   const [cmtRep, setCmtRep] = useState()
   const [isCmtRep, setIsCmtRep] = useState(false)
@@ -396,7 +401,7 @@ const PostComments = ({ngaydi,islocked,id_userPost,id_post, isVisible, onClose }
         <ScrollView style={{ width: '100%', height: '80%', marginTop: 30 }} onScroll={loadMore}>
         <RefreshControl onRefresh={() => loadCommentsPost()} />
         {loading && <ActivityIndicator />}
-          {comments.length != 0 && <Comments ngaydi={ngaydi} id_userPost={id_userPost}  id_P = {id_post} setIdReped={setIdCmt} handleRef={handleButtonPress}  setIn = {setIndex} comments={comments} rep = {cmtRep} setRep = {setCmtRep} set = {setComments} setIsCmtR = {setIsCmtRep} ref={inputRef} />}
+          {comments.length != 0 && <Comments title={title} ngaydi={ngaydi} id_userPost={id_userPost}  id_P = {id_post} setIdReped={setIdCmt} handleRef={handleButtonPress}  setIn = {setIndex} comments={comments} rep = {cmtRep} setRep = {setCmtRep} set = {setComments} setIsCmtR = {setIsCmtRep} ref={inputRef} />}
           {loading && page > 1 && <ActivityIndicator />}
 
         </ScrollView>

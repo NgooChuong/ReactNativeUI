@@ -22,12 +22,13 @@ import { authentication, db } from '../../firebase/firebaseconf'
 
   const EditProfile = ({ navigation }) => {
     const dlUser= useContext(Mycontext)
+    console.log('adwdwadadawfgafagef',dlUser[0]);
     const [selectedImage, setSelectedImage] = useState(dlUser[0].avatar);
     const [name, setName] = useState(dlUser[0].username);
     const [email, setEmail] = useState(dlUser[0].email);
     // const [password, setPassword] = useState("");
-    const [first_name, setFirstName] = useState(dlUser[0].firstname);
-    const [last_name, setLastName] = useState(dlUser[0].lastname);
+    const [first_name, setFirstName] = useState(dlUser[0].first_name);
+    const [last_name, setLastName] = useState(dlUser[0].last_name);
     const [loading, setLoading] = useState(false);
     const changeFireStoreAuthenticate = async (user) => {
       try {
@@ -405,3 +406,7 @@ import { authentication, db } from '../../firebase/firebaseconf'
   };
   
   export default EditProfile;
+
+
+
+

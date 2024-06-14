@@ -1,9 +1,12 @@
-import React, {memo, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView,Animated ,ActivityIndicator } from 'react-native';
 import { MaterialIcons } from "@expo/vector-icons";
 import { SIZES , COLORS} from '../../constants';
 import moment from 'moment';
-
+import MapViewComponent from './map';
+import {collection, getDocs,doc, getDoc} from 'firebase/firestore';
+import { db } from '../../firebase/firebaseconf';
+import { Button } from 'react-native-paper';
 
 
 
@@ -13,6 +16,75 @@ const PostJourney = ({Journey,sl_stoplocal})=>{
     const [isPressed, setIsPressed] = useState(Array(sl_stoplocal+2).fill(false));
     const [isVisible, setIsVisible] = useState(Array(sl_stoplocal+2).fill(false));
     const [isRender, setRender] = useState(false);
+    const [Locals, setLocals] = useState([])
+    const [route, setRoute] = useState(null);
+    const [index, setIndex] = useState(0)
+    const handleRoutePress = async (length) => {
+        const routeCoordinates = [];
+        for (let i = 0; i <=length; i++) {
+            routeCoordinates.push({
+                latitude: Locals[i].latitude,
+                longitude: Locals[i].longitude,
+            }
+        )
+    }
+        setRoute(routeCoordinates);
+    };
+    const getDiaDiemFireBase = async(docu) =>{
+        const docRef = doc(db, 'Local', docu);
+        const docs = await getDoc(docRef)
+        console.log('Query snapshot', docs.data())
+        return  docs.data()
+    }
+    const getDiaDiemSFireBase =async (length,data) =>{
+        console.log('length',length)
+        const arrLocal = []
+        let toado
+        for (let i = 0; i < length; i++) {
+            if (i==0){
+                console.log('1');
+                toado = await getDiaDiemFireBase(data.id_tuyenDuong.id_noiDi.diaChi);
+                console.log(i, toado);
+                if (toado) {
+                    arrLocal.push({
+                        ...toado,
+                        diaChi: data.id_tuyenDuong.id_noiDi.diaChi
+                    });
+                }
+                            }
+            else if (i==length-1) {
+                console.log('2');
+            toado = await getDiaDiemFireBase(data.id_tuyenDuong.id_noiDen.diaChi);
+            console.log(i, toado);
+            if (toado) {
+                arrLocal.push({
+                    ...toado,
+                    diaChi: data.id_tuyenDuong.id_noiDen.diaChi
+                });
+            }
+
+            }
+            else {
+                console.log('3');
+                toado = await getDiaDiemFireBase(data.stoplocal[i-1].id_DiaDiem.diaChi)
+                if (toado) {
+                    arrLocal.push({
+                        ...toado,
+                        diaChi: data.stoplocal[i - 1].id_DiaDiem.diaChi
+                    });
+                }
+
+            }
+        }
+        console.log('Query',arrLocal)
+                    setLocals(arrLocal)
+
+    } 
+      useEffect(() => {
+        
+        getDiaDiemSFireBase(sl_stoplocal+2,Journey)
+         }, []);
+
   const handlePress = (index) => {
     const boole = isPressed;
     const N_hidden = isVisible;
@@ -34,8 +106,8 @@ const PostJourney = ({Journey,sl_stoplocal})=>{
             }
            
         }
-    
-    
+    setIndex(index);
+    handleRoutePress(index)
     setIsVisible(N_hidden);
     setIsPressed(boole);
     setRender(!isRender);
@@ -52,7 +124,6 @@ const PostJourney = ({Journey,sl_stoplocal})=>{
                     </View>
                         
                 )
-               
             }
             else if (i==length-1){
                 elements.push
@@ -185,15 +256,21 @@ const PostJourney = ({Journey,sl_stoplocal})=>{
                 }
               </View>
             </ScrollView>
-            <View style = {{marginTop: 30}}>
-                <Text>MAP</Text>
-            </View>
+                {console.log(Locals)}
+                {console.log(Locals.length == 0)}
+
+               { Locals.length == 0 ? <ActivityIndicator/> :
+                <View style = {{marginTop: 30}}>
+                    <MapViewComponent local={Locals} route={route} index={index}/>
+                </View>
+            }
             <View>
                 <Text style ={{fontSize: 25, marginLeft:10, marginTop:5, fontWeight:'bold'}}>Lịch trình</Text>
 
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}  style ={{width: '100%',flexDirection:'row',marginTop: 30 }}>
                     {
                        renderButton(sl_stoplocal+2,Journey)
+
                     }
                 </ScrollView>
             </View>

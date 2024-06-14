@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
   const { name, posts } = userJson;
 
   const PhotosRoutes = ({setLoading,setPosts,page,loading,loadMore,posts,navigation}) => {
+    const dlUser = useContext(Mycontext)
     const xuLyDeletePost=async(idPost,index)=>{
       try {
         let token = await AsyncStorage.getItem('access-token');
@@ -55,15 +56,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
         <TouchableOpacity style={{ margin: 1, backgroundColor: color.white, padding:3, borderWidth: 1, borderColor: 'black', borderRadius: 10}} key={index} onPress={() => {navigation.navigate('PostDetail',{'place_id':user.id, "naviName": 'PostScreen'})}}>
           <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 1 }}>
             <Image
-              source={{ uri: user.user.avatar }}
+              source={{ uri: dlUser[0].avatar }}
               style={{ width: 30, height: 30, borderRadius: 15}}
             />
             <View>
-              <Text style={{ color: 'red', fontWeight: 'bold', fontSize: 14 }}>{user.user.username}</Text>
+              <Text style={{ color: 'red', fontWeight: 'bold', fontSize: 14 }}>{dlUser[0].username}</Text>
               <Text style={{ color: 'gray', fontSize: 12 }}>{moment(user.created_date).fromNow()}</Text>
             </View>
             <View style={{ flexDirection: 'row',flex:1,justifyContent: 'flex-end' }}>
-                <TouchableOpacity style = {{padding:5}} onPress={() => console.log('Edit')}>
+                <TouchableOpacity style = {{padding:5}} onPress={() => navigation.navigate("updatePost",{"id_post":user.id})}>
                   <FontAwesome name="pencil" size={20} color={color.primary} />
                 </TouchableOpacity>
 
@@ -115,6 +116,8 @@ const PostScreen = ({navigation}) => {
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const formData = route.params?.formData;
+    const formData1 = route.params?.formData1;
+
     // Sử dụng optional chaining để kiểm tra tồn tại của route.params
     const [posts, setPosts] = useState()
 
@@ -171,7 +174,7 @@ const PostScreen = ({navigation}) => {
       console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
       loadUserPosts()
       
-    }, [formData,page])
+    }, [formData,page,formData1])
     // const navigation = useNavigation();
 
 

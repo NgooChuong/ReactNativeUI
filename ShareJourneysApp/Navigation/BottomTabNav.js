@@ -19,11 +19,12 @@ import HistoryNavigate from "./History/Navigation";
 import UpPostNavigate from "./UpPostNavigation/navigation";
 import Home from "../Components/Chat/Home";
 import ChatNavigate from "./Chat/Navigation";
+import {sendNotification} from "../Components/Notification/Notification";
 
 const Tab = createBottomTabNavigator();
 
 const screenOptions = {
-  tabBarShowLabel: false,
+  tabBarShowLabel: true,
   headerShown: false,
   tabBarHideOnKeyboard: true,
   tabBarStyle: {
@@ -56,13 +57,17 @@ const BottomTabNav = () => {
                 />
               );
             },
+            tabBarLabelStyle: { fontSize: 16, color:COLORS.black}, // Chỉnh cỡ chữ cho tabBarLabel
+            tabBarActiveTintColor: COLORS.carrot,
           }}
         />
         
       <Tab.Screen
           name="ChatUser"
           component={ChatNavigate}
+          
           options={{
+            tabBarLabel: "Chat",
             tabBarIcon: ({ focused }) => {
               return (
                 <MaterialCommunityIcons
@@ -72,6 +77,8 @@ const BottomTabNav = () => {
                 />
               );
             },
+            tabBarLabelStyle: { fontSize: 16, color:COLORS.black}, // Chỉnh cỡ chữ cho tabBarLabel
+            tabBarActiveTintColor: COLORS.carrot,
           }}
         />
 
@@ -79,6 +86,7 @@ const BottomTabNav = () => {
           name="UpPost"
           component={UpPostNavigate}
           options={{
+            tabBarLabel: "Post",
             tabBarIcon: ({ focused }) => {
               return (
                 <MaterialCommunityIcons
@@ -88,12 +96,15 @@ const BottomTabNav = () => {
                 />
               );
             },
+            tabBarLabelStyle: { fontSize: 16, color:COLORS.black}, // Chỉnh cỡ chữ cho tabBarLabel
+            tabBarActiveTintColor: COLORS.carrot,
           }}
         />
         <Tab.Screen
           name="ProfileUser"
           component={ProfileNavigate}
           options={{
+            tabBarLabel: "Profile",
             tabBarIcon: ({ focused }) => {
               return (
                 <MaterialCommunityIcons
@@ -102,13 +113,18 @@ const BottomTabNav = () => {
                   color={focused ? COLORS.carrot : COLORS.black}
                 />
               );
+
             },
+            tabBarLabelStyle: { fontSize: 16, color:COLORS.black}, // Chỉnh cỡ chữ cho tabBarLabel
+            tabBarActiveTintColor: COLORS.carrot,
           }}
         />
         <Tab.Screen
           name="HistoryPost"
           component={HistoryNavigate}
           options={{
+            tabBarLabel: "History",
+            
             tabBarIcon: ({ focused }) => {
               return (
                 <MaterialCommunityIcons
@@ -118,13 +134,11 @@ const BottomTabNav = () => {
                 />
               );
             },
+            tabBarLabelStyle: { fontSize: 16, color:COLORS.black}, // Chỉnh cỡ chữ cho tabBarLabel
+            tabBarActiveTintColor: COLORS.carrot,
           }}
           
         />
-
-
-        
-
       </Tab.Navigator>
 
   );

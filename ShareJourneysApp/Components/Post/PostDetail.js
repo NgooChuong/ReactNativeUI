@@ -125,7 +125,7 @@ const PostDetail = ({navigation,route}) =>{
                       >
                           Xem bình luận
                       </Text>
-                {isReportModalVisible &&  <PostComments ngaydi = {detail.journey.ngayDi} islocked = {locked.isLocked}  isVisible={isReportModalVisible} onClose={handlePressCloseReportModal} id_userPost = {detail.user.id} id_post = {place_id}/>}
+                {isReportModalVisible &&  <PostComments title = {detail.title} ngaydi = {detail.journey.ngayDi} islocked = {locked.isLocked}  isVisible={isReportModalVisible} onClose={handlePressCloseReportModal} id_userPost = {detail.user.id} id_post = {place_id}/>}
                 <View style = {{height: 100}}/>
                 </TouchableOpacity>
                 {console.log('adwdadwadawdawdawdad',detail)}
