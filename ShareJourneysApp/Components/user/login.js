@@ -175,8 +175,21 @@ const Login = ({ navigation }) => {
                     />
 
                     <Text>Remenber Me</Text>
+                    
                 </View>
-
+                <View style={{addingVertical: 20}}>
+                        <Pressable
+                            onPress={() =>
+                             navigation.navigate('ForgotPassword')
+                            }>
+                            <Text style={{
+                                color: '#0057ff',
+                                textAlign: 'right',
+                                }}>
+                                    Forgot Password?
+                            </Text>
+                        </Pressable>
+                </View>
                 <Button
                     title="Login"
                     filled

@@ -1,0 +1,174 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity,Image, TextInput } from 'react-native';
+import { doc, getDoc } from 'firebase/firestore';
+import { getGroupMembers, removeMemberFromGroup } from './InitGroup'; // Import removeMemberFromGroup function
+import { MaterialIcons } from '@expo/vector-icons';
+import { COLORS } from '../../constants';
+import * as ImagePicker from "expo-image-picker";
+
+const GroupMemberList = ({ route }) => {
+  const { groupId,userId ,avatar,name} = route.params;
+  const [selectedImage, setSelectedImage] = useState(avatar);
+  const [nameChange, setNameChange] = useState(name);
+  const [input, setInputText] = useState(false);
+  const [members, setMembers] = useState([]);
+  const [isCreator, setIsCreator] = useState(false); // State to track if the current user is the creator
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const groupMembers = await getGroupMembers(groupId);
+        console.log("dasdda",groupMembers)
+        setMembers(groupMembers.memberData);
+        const groupCreatorId = groupMembers.memberData[0].uid;
+        console.log('dawdawda',groupCreatorId)
+        console.log('djapndmpawod',userId == groupCreatorId)
+
+        // Check if the current user is the creator of the group
+        setIsCreator(userId == groupCreatorId);
+      } catch (error) {
+        console.error('Error fetching members: ', error);
+      }
+    };
+
+    fetchMembers();
+  }, [groupId]);
+
+  const handleRemoveMember = async (memberId) => {
+    try {
+
+      await removeMemberFromGroup(groupId, memberId);
+      console.log('member',members)
+      setMembers(members.filter(m => m.uid !== memberId));
+    } catch (error) {
+      console.error('Error removing member: ', error);
+    }
+  };
+
+  const renderItem = ({ item }) => (
+    <View style={styles.memberItem}>
+      <Text style={styles.memberText}>{item.user}</Text>
+      {isCreator && (
+        <TouchableOpacity onPress={() => handleRemoveMember(item.uid)} style={styles.removeButton}>
+          <Text style={styles.removeButtonText}>Remove</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+
+  const handleImageSelection = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync();
+  
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0])
+
+    }
+    
+  };
+  return (
+    <View style={styles.container}>
+      <View>
+      <View
+            style={{
+              alignItems: "center",
+            }}
+          >
+            <TouchableOpacity onPress={handleImageSelection}>
+              <Image
+                source={{ uri: selectedImage }}
+                style={{
+                  height: 170,
+                  width: 170,
+                  borderRadius: 85,
+                  borderWidth: 2,
+                  borderColor: COLORS.primary,
+                }}
+              />
+  
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  right: 10,
+                  zIndex: 9999,
+                }}
+              >
+                <MaterialIcons
+                  name="photo-camera"
+                  size={32}
+                  color={COLORS.primary}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
+           <View style={{
+            alignItems: "center",
+            justifyContent: "center",
+            marginVertical: 22,
+            marginLeft:10,
+            flexDirection: "row",
+            borderBottomWidth:0.5,
+            borderBottomColor: COLORS.black,
+            padding:10
+ 
+           }}>
+                <TextInput
+                  value={nameChange}
+                  onChangeText={(value) => setNameChange(value)}
+                  editable={input}
+                  style={{fontSize:20, color:COLORS.black}}
+                />                
+                <TouchableOpacity onPress={()=>setInputText(!input)}>
+                  <MaterialIcons
+                    name="edit"
+                    size={25}
+                    color={input?COLORS.carrot:COLORS.black}
+                  />
+                </TouchableOpacity>
+            </View>       
+      </View>
+
+      <Text style={styles.memberTextTitle}>Number of members: {members.length}</Text>
+      <FlatList
+        data={members}
+        keyExtractor={(item) => item.uid}
+        renderItem={renderItem}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  memberItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  memberText: {
+    fontSize: 16,
+  },
+  memberTextTitle: {
+    fontSize: 20,
+    textAlign: 'center',
+    color: 'green',
+    marginBottom: 10,
+  },
+  removeButton: {
+    backgroundColor: 'red',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  removeButtonText: {
+    color: 'white',
+  },
+});
+
+export default GroupMemberList;

@@ -10,6 +10,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 // import Mycontext from './configs/Mycontext';
 import Login from '../../Components/user/login';
 import Signup from '../../Components/user/signup';
+import ForgotPassword from '../../Components/user/ForgotPassword';
+import ResetPasswords from '../../Components/user/ResetPassword';
+import OTPPasword from '../../Components/user/EnterOTP';
 
  const Stack = createNativeStackNavigator();
  const LoginNavigation = () => {
@@ -25,6 +28,27 @@ import Signup from '../../Components/user/signup';
                       headerShown: false
                     }}
                     />
+                    <Stack.Screen
+                  name='ForgotPassword'
+                  component={ForgotPassword}
+                  options={{
+                    headerShown: false
+                }}
+                />
+                <Stack.Screen
+                  name='ResetPassword'
+                  component={ResetPasswords}
+                  options={{
+                    headerShown: false
+                }}
+                />
+                <Stack.Screen
+                  name='EnterOTP'
+                  component={OTPPasword}
+                  options={{
+                    headerShown: false
+                }}
+                />
                   {/* <Stack.Screen
                     name='Chat'
                     component={Chat}
@@ -68,7 +92,7 @@ import Signup from '../../Components/user/signup';
                   
                   /> */}
   
-  
+                    
   
             </Stack.Navigator>
   

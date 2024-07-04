@@ -18,7 +18,6 @@ const ICONNE = ()=>{
         if(value!=undefined) {
             setPickerLocalCome(value);
             let array = [...filterQuery,{'id_localcome':value}];
-            console.log('arr1',array)
         }
         
         // setFilterQuery(array);
@@ -28,7 +27,6 @@ const ICONNE = ()=>{
         if (value!=undefined) {
             setPickerLocalArrive(value);
             let array = [...filterQuery,{'id_localarrive':value}];
-            console.log('arr2',array)
         // setFilterQuery(array);
         }
         

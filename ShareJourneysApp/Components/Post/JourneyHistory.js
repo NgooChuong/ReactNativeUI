@@ -10,7 +10,7 @@ import {
     ScrollView,
     ActivityIndicator,
   } from "react-native";
-  import React, { useEffect, useState } from "react";
+  import React, { useContext, useEffect, useState } from "react";
   import { SafeAreaView } from "react-native-safe-area-context";
   import { StatusBar } from "expo-status-bar";
   import { MaterialIcons } from "@expo/vector-icons";
@@ -21,12 +21,69 @@ import styles from "../../style/Style";
 import {  FontAwesome } from '@expo/vector-icons';
 import RatingModal from "./ModalRating";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { authApi, endpoints } from "../../config/APIs";
+import APIs, { authApi, endpoints } from "../../config/APIs";
 import moment from "moment";
+import ModalSelectJourney from "./ModalSelectJourney";
+import Mycontext from "../../config/Mycontext";
 
 const { name, posts } = userJson;
 const LichSuDaDangKy = ({navigation}) => {
   const [posts, setPosts] = useState()
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentJourney, setCurrentJourney] = useState(null);
+  const [confirmedPosts, setConfirmedPosts] = useState({});
+  const [cancelledPosts, setCancelledPosts] = useState({});
+  const dlUser= useContext(Mycontext)
+
+  const delCompanion = async (idPost) => {
+      try {
+          console.log('LOADCOMPANION');
+          console.log(typeof  dlUser[0].id);
+          
+          // Đảm bảo rằng id_user_companion đã được định nghĩa và không rỗng
+          if ( dlUser[0].id) {
+              let res = await APIs.delete(endpoints['deleteCompanion'](idPost), {
+                data: { idUser: dlUser[0].id }
+            });
+
+          } else {
+              console.error('id_user_companion is undefined or empty');
+          }
+      } catch (ex) {
+          console.error(ex);
+      }
+  }
+  const handleConfirmPress = (journey) => {
+    setCurrentJourney(journey);
+    setModalVisible(true);
+  };
+
+  const handleCancelPress = (journeyId) => {
+    setCancelledPosts(prevState => ({
+      ...prevState,
+      [journeyId]: true,
+    }));
+    setConfirmedPosts(prevState => ({
+      ...prevState,
+      [journeyId]: false,
+    }));
+    delCompanion(journeyId);
+  };
+
+  const handleModalClose = (selectedStops) => {
+    setModalVisible(false);
+    if (selectedStops && currentJourney) {
+      setConfirmedPosts(prevState => ({
+        ...prevState,
+        [currentJourney]: true,
+      }));
+      setCancelledPosts(prevState => ({
+        ...prevState,
+        [currentJourney]: false,
+      }));
+    }
+  };
+
   const loadHisPostRegister = async() => {
     try {
       let token = await AsyncStorage.getItem('access-token');
@@ -48,9 +105,9 @@ return (
       {posts==undefined? <ActivityIndicator/>:posts.map((user, index) => (
         <TouchableOpacity
           style={{
-            margin: 1,
+            margin: 5,
             backgroundColor: color.white,
-            padding: 3,
+            padding: 5,
             borderWidth: 1,
             borderColor: 'black',
             borderRadius: 10,
@@ -90,7 +147,35 @@ return (
             >
               {user.title}
             </Text>
-          
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: 250, padding:10 }}>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: confirmedPosts[ user.post_id] ? 'gray' : 'blue',
+                    padding: 5,
+                    borderRadius: 5,
+                    marginRight: 5,
+                    flex: 1,
+                  }}
+                  onPress={() => !confirmedPosts[user.post_id] && !cancelledPosts[user.post_id]&& user.active===false && handleConfirmPress( user.post_id)}
+                >
+                  <Text style={{ color: 'white', textAlign: 'center' }}>
+                    {confirmedPosts[user.post_id] || user.active===true ? 'Đã Xác Nhận' : 'Xác nhận'}
+                  </Text>
+                  </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: cancelledPosts[user.post_id] ? 'gray' : 'orange',
+                    padding: 5,
+                    borderRadius: 5,
+                    flex: 1,
+                  }}
+                  onPress={() => !cancelledPosts[user.post_id] && handleCancelPress(user.post_id)}
+                >
+                  <Text style={{ color: 'white', textAlign: 'center' }}>
+                    {cancelledPosts[user.post_id] ? 'Đã Hủy' : 'Hủy xác nhận'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
             <View style={{borderColor:"black",borderWidth:1,borderRadius:10,height:"40%",left:70,top:0,marginTop:-3,shadowColor:"grey",shadowOpacity:100,shadowRadius:10}}>
                 <Text
@@ -107,11 +192,19 @@ return (
                 >
                 { moment(user.created_date).format("HH:mm:ss")}
                 </Text>
+                
             </View>
            
           </View>
         </TouchableOpacity>
       ))}
+         {modalVisible && (
+        <ModalSelectJourney
+          visible={modalVisible}
+          setModalVisible={handleModalClose}
+          id_Post={currentJourney}
+        />
+      )}
     </ScrollView>
 )
 };
@@ -133,15 +226,12 @@ return (
     loadHisPost()
   }, [isRatingModalVisible])
     const handlePressRating = (userId) => {
-      console.log(`Report button pressed for user ${userId}`);
       id= userId
-      console.log(id);
       setIsRatingModalVisible(true);
     };
   
     const handlePressCloseRatingModal = () => {
       setIsRatingModalVisible(false);
-      console.log(posts);
     };
   
     return (

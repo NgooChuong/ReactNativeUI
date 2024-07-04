@@ -67,7 +67,6 @@ export default function Notification(){
     let token;
 
     if (Platform.OS === "android") {
-      console.log("vo android")
       await Notifications.setNotificationChannelAsync("default", {
         name: "default",
         vibrationPattern: [0, 250, 250, 250],
@@ -77,7 +76,6 @@ export default function Notification(){
     }
 
     if (Device.isDevice) {
-       console.log("vo if deviex");
       const { status: existingStatus } =
         await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
@@ -96,7 +94,6 @@ export default function Notification(){
           projectId: "c42e080a-a85f-4e8d-8e2f-ae7193c02611",
         })
       ).data;
-      console.log(token);
     } else {
       alert("Must use physical device for Push Notifications");
     }
@@ -124,7 +121,6 @@ const sendTo = async (expoPushToken,body) =>{
     },
     body: JSON.stringify(message),
   });
-  console.log('dawdwdaw',res.status);
 }
 
 export const sendNotification = async (body,username) => {

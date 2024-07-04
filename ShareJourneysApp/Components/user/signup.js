@@ -72,12 +72,18 @@ const Signup = ({ navigation }) => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-
+            
             await registerUser(res.data)
             navigation.navigate("Login");
             console.info(res.data);
         } catch (ex) {
-            console.error("Loi",ex);
+
+
+            if (ex.response.status == 400) {
+                if ( ex.response.data.username == "A user with that username already exists."){
+                    alert('Tài khoản đã tồn tài')
+                }
+            }
         } finally {
 
             setLoading(false);
@@ -86,8 +92,6 @@ const Signup = ({ navigation }) => {
     const { username, password, } = user;
     const registerUser = async (data) => {
         const { avatar } = data;
-
-        console.log("firese1")
         await createUserWithEmailAndPassword(authentication, username, password)
         .then( (userCredentials) => {
             const userUID = userCredentials.user.uid;

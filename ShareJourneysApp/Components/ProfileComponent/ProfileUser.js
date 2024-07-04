@@ -231,7 +231,7 @@ const Profile = ({navigation, route}) => {
                 color: "red",
               }}
             >
-              {(pofile.avgRate *10).toFixed(0)}%
+              {((pofile.avgRate/5) *100).toFixed(0)}%
             </Text>
           </View>
         </View>

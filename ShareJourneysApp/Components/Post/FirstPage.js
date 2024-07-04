@@ -11,14 +11,12 @@ export const ImageList = ({ page,  loadPicture, loading, images, onSelect,loadMo
   const [imageSelections, setImageSelections] = useState({});
   const handleImageSelection = (image) => {
     const updatedSelections = { ...imageSelections };
-    console.log("ham moi")
     updatedSelections[image.id] = !updatedSelections[image.id];
 
     if (updatedSelections[image.id]) {
       setImageSelections(updatedSelections);
 
     } else {
-      console.log("Bo loi")
       
     }
 
@@ -65,11 +63,9 @@ const FirstPage = ({ formData, onChangeText, onPressNext }) => {
         let res = await APIs.get(`${endpoints['picture']}?page=${page}`);
         if (res.data.next === null){
           setPage(0);
-          console.log('1')
         }
         if (page === 1){
           setPicture(res.data.results);
-          console.log('2')
         }
         else
         setPicture(current => {
@@ -97,7 +93,6 @@ const isCloseToEnd = ({layoutMeasurement, contentOffset, contentSize}) => {
 };
 const loadMore = ({nativeEvent}) => {
   if (!loading && page > 0 && isCloseToEnd(nativeEvent)) {
-      console.log('3')
           setPage(page + 1);
   }
 }
@@ -125,25 +120,21 @@ const loadMore = ({nativeEvent}) => {
               }
             });
             setImage(selectedImages[0]);
-            console.log(selectedPictures)
            //formData.pictureDaChon.push(...selectedImages); // Update the formData object with multiple selected images
             formData.pictureUserSelect.push(...selectedPictures)
             formData.anhTam.push({
               id: "device",
               picture:selectedImages[0],
             })
-            console.log('', formData.anhTam)
             setPictureDaChon([...formData.anhTam])
           }
     }
 };
   const handleImageSelect = (image) => {
     setImage(image);
-    console.log("vao duoc");
-    console.log(pictureDaChon);
+  
     if(formData.pictureDaChon.length ===0)
     {
-      console.log("oke len")
       formData.pictureDaChon.push(image.id)
       formData.anhTam.push(
         {
@@ -156,7 +147,6 @@ const loadMore = ({nativeEvent}) => {
     }
     else
     {
-      console.log("khong oke len")
       formData.pictureDaChon.map(picture=>{
         if (!formData.pictureDaChon.includes(image.id)) {
           formData.pictureDaChon.push(image.id); // Update the formData object directly
@@ -169,7 +159,6 @@ const loadMore = ({nativeEvent}) => {
       })
     }
     const add= [...formData.anhTam]
-    console.log('adddddd',add)
     setPictureDaChon(add)
     onChangeText(formData); // Pass the updated formData object to the onChangeText function
   };
@@ -178,20 +167,15 @@ const loadMore = ({nativeEvent}) => {
   };
   const handleUnselectImage = (index) => {
   //console.log(selected);
-   console.log(index)
-   console.log('pictureDaChon',pictureDaChon)
    
     const updatedImages = [...pictureDaChon];
    // const updateHT= [...selected]
-    console.log("truoc khi update",updatedImages);
     updatedImages.splice(index, 1);
     //updateHT.splice(index,1);
-    console.log("sau khi update",updatedImages);
     setPictureDaChon(updatedImages);
     formData.anhTam = updatedImages;
     //formData.pictureDaChon=updateHT;
    // console.log(formData.pictureDaChon)
-    console.log("anh tan", formData.anhTam);
     if(formData.anhTam.length==0)
     {
       formData.pictureDaChon=[];
@@ -199,8 +183,7 @@ const loadMore = ({nativeEvent}) => {
       return;
     }
     // pic da chon: tu he thong
-    console.log('formData.pictureUserSelect11111111',formData.pictureUserSelect)
-    console.log('formData.pictureDaChon111111111111',formData.pictureDaChon);
+
     formData.pictureDaChon = formData.anhTam.filter(image => image.id != "device").map(image => image.id);
     const selectedPictures = formData.anhTam
     .filter(image => image.id == "device")
@@ -212,7 +195,6 @@ const loadMore = ({nativeEvent}) => {
     //   formData.pictureUserSelect.some(pic => pic.uri == image.picture);
     // })
     formData.pictureUserSelect= filteredPictures
-    console.log('selectedPictures',filteredPictures)
 
 
     // console.log('formData.pictureUserSelect',formData.pictureUserSelect)

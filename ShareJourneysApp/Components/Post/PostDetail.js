@@ -16,13 +16,7 @@ import Swiper from 'react-native-swiper';
 import Mycontext from '../../config/Mycontext';
 import { CommonActions, useRoute } from '@react-navigation/native';
 
-const Dot = () => (
-  <View style={{ backgroundColor: 'rgba(0,0,0,.2)', width: 8, height: 8, borderRadius: 4, marginHorizontal: 5 }} />
-);
 
-const ActiveDot = () => (
-  <View style={{ backgroundColor: '#000', width: 8, height: 8, borderRadius: 4, marginHorizontal: 5 }} />
-);
 
 const PostDetail = ({navigation,route}) =>{
   console.log(route.params);
@@ -47,6 +41,7 @@ const PostDetail = ({navigation,route}) =>{
           'color': res.data.active?'black':MD3Colors.error50
         })
         setDetail(res.data)
+        
         }
         catch(ex)
         {
@@ -142,7 +137,7 @@ const PostDetail = ({navigation,route}) =>{
                 </View>
 
             </ScrollView>
-            <FixedButton setcompanion={setcompanion} navigation = {navigation}  companions = {detail.travelCompanion} userPost = {detail.user}  id_post = {place_id}/>
+            {detail.journey===undefined ?<ActivityIndicator/>:<FixedButton setcompanion={setcompanion} Journey = {detail.journey} navigation = {navigation}  companions = {detail.travelCompanion} userPost = {detail.user}  id_post = {place_id}/>}
         </SafeAreaView>
     )
     

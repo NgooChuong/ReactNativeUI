@@ -23,6 +23,9 @@ import { deleteDevide } from '../Notification/Notification';
     const ToEditProfile = () =>{
         navigation.navigate('EditProfile');
     }
+    const ToChangePassword = () =>{
+      navigation.navigate('ChangePassword');
+  }
     const logout = async () => {
       const token_device = await AsyncStorage.getItem('token_device')
       console.log(token_device)
@@ -92,6 +95,38 @@ import { deleteDevide } from '../Notification/Notification';
               color={COLORS.black}
                 />
                 Edit Profile
+              </Text>
+              <MaterialIcons
+              name="arrow-circle-right"
+              size={24}
+              color={COLORS.black}
+                />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={ToChangePassword}
+              style={{
+                width: '100%',
+                height: '10%',
+                flexDirection: 'row',
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: COLORS.white,
+                justifyContent: "space-between",
+                borderStyle: "solid",
+                borderWidth: 2,
+                }}
+            >
+              <Text
+                style={{
+                  ...FONTS.body2,
+                  color: COLORS.black,
+                }}
+              >
+                <MaterialIcons
+              name="settings"
+              size={24}
+              color={COLORS.black}
+                />
+                Change password
               </Text>
               <MaterialIcons
               name="arrow-circle-right"

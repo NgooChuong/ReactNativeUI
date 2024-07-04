@@ -21,214 +21,15 @@ import APIs, { authApi, endpoints } from '../../config/APIs';
 import Mycontext from '../../config/Mycontext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sendNotification } from '../Notification/Notification';
+import Comment from './Comment';
+import Comments from './Comments';
 
 
 
 
 
-const Comment =forwardRef(({ title ,ngaydi,id_userPost,setIdReped,id_P, id_c,reference, index, setIn, comment,bool,setIsCmtRep }, ref) => {
-  const [selectedReason, setSelectedReason] = useState();
-  const [tick, setTick] = useState();
-  const dlUser= useContext(Mycontext)
 
-  const handleRep = (id_c) => {
-    console.log('abc')
-    console.log(index)
-    console.log(bool)
-    console.log(id_c)
-
-    reference()
-    setIn(index)
-    setIsCmtRep(bool);
-    setIdReped(id_c)
-
-  };
-
-  const AddCommentTick = async (id_userCMT) =>{
-    try{
-      let res = await APIs.post(endpoints['add-tick'](id_P,id_c),{'idUser': id_userCMT})
-      console.log('TIcklkkkkkkkkkkkkkkkkkkkkkkkkk',res.data)
-      setTick(res.data)
-      if (res.data.tick[0].active == true) {
-        sendNotification(`Bạn được mời đi chung hành trình ${title}`,res.data.user.username)
-      }
-      else {
-        sendNotification(`Bạn bị hủy hành trình ${title}` ,res.data.user.username)
-      }
-    }
-      catch(ex)
-      {
-        console.error(ex);
-      }
-  }
-
-
-  
-  const handlePressReason = (reason, id_userCMT) => {
-    console.log('dawdadawdawdddddw',id_userCMT, reason)
-    console.log('dawdadawd',dlUser[0].id)
-    console.log('dawdadawdawdddddw222222222222',id_userPost)
-    console.log('dawdadawdawdddddw333333333333',selectedReason)
-
-    if (id_userPost == dlUser[0].id)
-    {
-      AddCommentTick(id_userCMT)
-      if (selectedReason == reason) {
-        console.log('1')
-        setSelectedReason(null);
-      } else {
-        console.log('2')
-        setSelectedReason(reason);
-      }
-    }
-  }
-  const checkDisabledButon =()=> {
-    console.log(moment(ngaydi))
-    console.log(moment())
-
-    console.log(moment() >= moment(ngaydi))
-    if ( moment().isAfter(moment(ngaydi)))
-      return true
-    return false
-  }
-  return (
-    <TouchableOpacity disabled={checkDisabledButon()}  onPress={() => handlePressReason(index, comment.user.id)}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-      <Image source={{ uri:  comment.user.avatar }} style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }} />
-
-        <View style={{ flex: 1, width: 'auto', backgroundColor: 'lightgray', borderStyle: 'solid', borderWidth: 1, borderRadius: 20, padding: 10 }}>
-          <Text style={{ fontWeight: 'bold' }}>{comment.user.username}</Text>
-          <Text>{comment.content}</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-            <Text style={{ color: 'black', fontSize: 12 }}>{moment(comment.created_date).fromNow()}</Text>
-
-
-            <TouchableOpacity style={{ marginLeft: 10 }} onPress={() => handleRep(id_c)} ref={ref}>
-              <Feather name="message-circle" size={20} color="black" />
-            </TouchableOpacity>
-
-            {/* {console.log(comment.tick!= undefined )}
-            {console.log( comment.tick.length > 0)}
-            {console.log( comment.tick[0].active)} */}
-            {/* {console.log('cawcaw' ,tick)} */}
-            { tick==undefined? comment.tick!= undefined && comment.tick.length > 0 && comment.tick[0].active &&
-            <>
-              <View style={{ justifyContent: 'flex-end', width: 40 }}>
-                  <MaterialIcons
-                            name="check-circle"
-                            size={24}
-                            color="green"
-                          />
-              </View>
-            </>:
-            tick.tick[0].active &&
-            <>
-            <View style={{ justifyContent: 'flex-end', width: 40 }}>
-                <MaterialIcons
-                          name="check-circle"
-                          size={24}
-                          color="green"
-                        />
-            </View>
-          </>
-            }
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-});
-
-
-const Comments = forwardRef(({title ,ngaydi,id_userPost,id_P, setIdReped,handleRef, setIn, comments, set, setRep, rep,setIsCmtR }, ref) => {
-  const [showReplyViews, setShowReplyViews] = useState(Array(comments.length).fill(false));
-  const [up, setUp] = useState(90)
-  // const [indexState,setIndexState] = useState(0);
-  // const [id_cmt, setId_cmt] = useState()
-  // const [load, setLoad]= useState(false)
-  const loadCommentRepPost = async (comment_id,index) =>{
-    try{
-      let res = await APIs.get(endpoints['reply'](comment_id))
-      const newRep = [...rep]; // Sao chép mảng Rep
-      newRep[index] = res.data // Thay đổi giá trị tại index
-      setRep(newRep); // Cập nhật mảng Rep
-      }
-      catch(ex)
-      {
-        console.error(ex);
-      }
-  }
-
-
-  const handleReplyPress =  (index, id_cmt,rep, count_rep) => {
-     let change = -up
-    setUp(change)
-    const newShowReplyViews = [...showReplyViews];
-
-    newShowReplyViews[index] = !newShowReplyViews[index];
-   
-
-
-    setShowReplyViews(newShowReplyViews);
-    loadCommentRepPost(id_cmt, index);
-
-  };
-  
-  // useEffect(() => {
-  //   if (showReplyViews[indexState]) {
-  //     loadCommentRepPost(id_cmt, indexState);
-  //   }
-  //   setLoad(true);
-  // }, [showReplyViews[indexState]]);
-
-
-  const useHandleRefresh = ()=>{
-    handleRef()
-  }
-  return (
-    <View >
-      {comments.map((comment, indexArr) => (
-        <View  key={comment.id} style={{ flexDirection: 'column' }}>
-           <Comment  title={title} ngaydi={ngaydi} ref={ref} id_userPost={id_userPost}  setIdReped={setIdReped} id_P = {id_P} id_c = {comment.id} reference={useHandleRefresh} comment={comment} index={indexArr} bool ={true} idCmt = {comment.id} setIsCmtRep={setIsCmtR} setIn={setIn} />
-          
-          {/* nut hien reply */}
-          {comment.reply_count != 0 &&
-            <TouchableOpacity style={{ alignSelf: 'flex-end', marginBottom: 20, marginRight: 20, flexDirection: 'row' }} onPress={() => handleReplyPress(indexArr, comment.id, rep,comment.reply_count)}>
-              <MaterialIcons name="play-arrow" size={24} color="black" style={{ transform: [{ rotate: `${up}deg` }] }} />
-              <Text style={{ color: 'black', fontSize: 12 }}>{comment.reply_count} reply</Text>
-            </TouchableOpacity>} 
-
-
-            {/* show reply */}
-          {showReplyViews[indexArr] && (
-            <View style={{ paddingLeft: 30, marginTop: 10 }}>
-              
-              {rep.length == 0? <ActivityIndicator/>:  
-              <>
-           
-
-                {!Array.isArray( rep[indexArr])?   <ActivityIndicator/>:
-               <>
-               {   rep[indexArr].map((reply, indexArr) => (
-                  <View style={{ paddingLeft: 10, marginTop: 10 }} key={indexArr}>
-                    <Comment reference={useHandleRefresh} comment={reply} index={''} setIn={setIn} bool={false} setIsCmtRep={setIsCmtR}/>
-                  </View>
-                ))}
-               </>
-                }
-              </>
-              }
-              
-            </View>
-          )}
-        </View>
-      ))}
-    </View>
-  );
-});
-
-
-const InputView = forwardRef(({view,setView, id_c,id_P,index,setIn,comments, set,rep, setRep ,iscmtRep,setIsCmtR }, ref) => {
+const InputView = forwardRef(({showReplyViews,setShowReplyViews,setUp,view,setView, id_c,id_P,index,setIn,comments, set,rep, setRep ,iscmtRep,setIsCmtR }, ref) => {
   const [newCommentText, setNewCommentText] = useState('');
 
   
@@ -247,7 +48,21 @@ const InputView = forwardRef(({view,setView, id_c,id_P,index,setIn,comments, set
           console.error(ex);
       }
   }
-
+  const loadCommentRepPosts = async (comment_id) => {
+    try{
+      let res = await APIs.get(endpoints['reply'](comment_id))
+      const newRep = [...rep]; // Sao chép mảng Rep
+      newRep[index] = res.data // Thay đổi giá trị tại index
+      console.log('draahghjhjhhjh',res.data)
+      console.log('BEn Postcomments',newRep);
+      setRep(newRep); // Cập nhật mảng Rep
+      // return newRep // Cập nhật mảng Rep
+      }
+      catch(ex)
+      {
+        console.error(ex);
+      }
+  }
   const addRep = async () => {
     try {
       let token = await AsyncStorage.getItem('access-token');
@@ -255,9 +70,13 @@ const InputView = forwardRef(({view,setView, id_c,id_P,index,setIn,comments, set
           'content': newCommentText
       })
 
-      // setRep([res.data,...rep]);
       const cm = comments.splice(index, 1,res.data);
-      console.log('123456',cm);
+      // console.log('123456',cm);
+      // setUp(-90);
+      const newShowReplyViews = [...showReplyViews];
+      newShowReplyViews[index] = true;
+      setShowReplyViews(newShowReplyViews);
+     loadCommentRepPosts(cm[0].id)
       set(comments);
       setView(!view);
 
@@ -306,6 +125,8 @@ const PostComments = ({title,ngaydi,islocked,id_userPost,id_post, isVisible, onC
   const [viewCMTRep,setViewCMTRep ] = useState(false);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [showReplyViews, setShowReplyViews] = useState(Array(comments.length).fill(false));
+  const [up, setUp] = useState(90)
 
   const handleButtonPress = () => {
     // Thực hiện hành động trên TextInput của thành phần cha
@@ -315,24 +136,10 @@ const PostComments = ({title,ngaydi,islocked,id_userPost,id_post, isVisible, onC
     }
   };
 
-  // const NewUserCmt = () => {
-  //   let id =''
-  //   if (comments.length== 0) {
-  //     id= 0
-  //   }
-  //   else comments[0].id + 1
-    
-  //   return user
-  // }
-
-
-
   const loadCommentsPost = async () =>{
-    console.log('page',page)
 
     if (page > 0) {
       setLoading(true);
-      console.log('k vo day')
     try{
       let res = await APIs.get(`${endpoints['comments'](id_post)}?page=${page}`)
 
@@ -358,7 +165,6 @@ const PostComments = ({title,ngaydi,islocked,id_userPost,id_post, isVisible, onC
   }
 }
   useEffect(()=>{
-    console.log('dawddddddddddddddddddddddddddddddddddddddddddddddddddwoo[pmomopm');
     loadCommentsPost();
   },[id_post,viewCMTRep,page])
 
@@ -367,10 +173,6 @@ const PostComments = ({title,ngaydi,islocked,id_userPost,id_post, isVisible, onC
 
   },[comments])
 
-  // useEffect(()=>{
-  //   console.log('cadwda',cmtRep)
-  //   setViewCMTRep(!viewCMTRep)
-  // },[cmtRep])
 
     const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
       const paddingToBottom = 20;
@@ -401,12 +203,46 @@ const PostComments = ({title,ngaydi,islocked,id_userPost,id_post, isVisible, onC
         <ScrollView style={{ width: '100%', height: '80%', marginTop: 30 }} onScroll={loadMore}>
         <RefreshControl onRefresh={() => loadCommentsPost()} />
         {loading && <ActivityIndicator />}
-          {comments.length != 0 && <Comments title={title} ngaydi={ngaydi} id_userPost={id_userPost}  id_P = {id_post} setIdReped={setIdCmt} handleRef={handleButtonPress}  setIn = {setIndex} comments={comments} rep = {cmtRep} setRep = {setCmtRep} set = {setComments} setIsCmtR = {setIsCmtRep} ref={inputRef} />}
+          {comments.length != 0 && <Comments
+           title={title} 
+           ngaydi={ngaydi} 
+           id_userPost={id_userPost}  
+           id_P = {id_post} 
+           setIdReped={setIdCmt} 
+           handleRef={handleButtonPress}  
+           setIn = {setIndex} 
+           comments={comments} 
+           rep = {cmtRep} 
+           setRep = {setCmtRep} 
+           set = {setComments} 
+           setIsCmtR = {setIsCmtRep} 
+           ref={inputRef} 
+           setShowReplyViews={setShowReplyViews}
+           setUp={setUp}
+           showReplyViews={showReplyViews}
+           up={up}
+           />}
           {loading && page > 1 && <ActivityIndicator />}
 
         </ScrollView>
-        {console.log('lockkkkkkkkkkkkkkkkkk',islocked)}
-        {islocked != 'lock'  && <InputView view = {viewCMTRep} setView = {setViewCMTRep} id_P = {id_post} id_c ={idCmt} comments={comments} index={index} setIn = {setIndex} set={setComments} rep = {cmtRep} setRep = {setCmtRep} iscmtRep = {isCmtRep} setIsCmtR = {setIsCmtRep}  ref={inputRef} />}
+        {islocked != 'lock'  && <InputView 
+        view = {viewCMTRep} 
+        setView = {setViewCMTRep} 
+        id_P = {id_post} 
+        id_c ={idCmt} 
+        comments={comments} 
+        index={index} 
+        setIn = {setIndex} 
+        set={setComments} 
+        rep = {cmtRep} 
+        setRep = {setCmtRep} 
+        iscmtRep = {isCmtRep} 
+        setIsCmtR = {setIsCmtRep}  
+        ref={inputRef} 
+        setShowReplyViews={setShowReplyViews}
+        setUp={setUp}
+        showReplyViews={showReplyViews}
+        />}
       </View>
     </Modal>
   );

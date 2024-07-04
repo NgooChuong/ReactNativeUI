@@ -28,7 +28,6 @@ const RatingModal = ({ isVisible, onClose,posts,idPost}) => {
 
   const handlePressConfirm = async() => {
     if (selectedReason) { 
-      console.log(`Kết quả rating: ${selectedReason}`);
       try {
         let token = await AsyncStorage.getItem('access-token');
         let res = await authApi(token).post(endpoints['rates'](idPost), {
@@ -58,7 +57,6 @@ const RatingModal = ({ isVisible, onClose,posts,idPost}) => {
       
      
       
-      console.log(posts);
       //Cho nay xu ly lu du lieu json
       onClose();
    } else {

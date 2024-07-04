@@ -22,7 +22,6 @@ import { authentication, db } from '../../firebase/firebaseconf'
 
   const EditProfile = ({ navigation }) => {
     const dlUser= useContext(Mycontext)
-    console.log('adwdwadadawfgafagef',dlUser[0]);
     const [selectedImage, setSelectedImage] = useState(dlUser[0].avatar);
     const [name, setName] = useState(dlUser[0].username);
     const [email, setEmail] = useState(dlUser[0].email);
@@ -213,7 +212,6 @@ import { authentication, db } from '../../firebase/firebaseconf'
             }}
           >
             <TouchableOpacity onPress={handleImageSelection}>
-            {console.log('abc',selectedImage)}
               <Image
                 source={{ uri: selectedImage.uri || dlUser[0].avatar }}
                 style={{

@@ -2,7 +2,7 @@ import React, {  useState, useEffect } from 'react';
 import { Drawer,  } from 'react-native-paper';
 import {StyleSheet, TouchableOpacity, Text,View,Button, ScrollView,Modal} from 'react-native';
 import { COLORS, SIZES } from '../../constants';
-import { RadioButton, Chip } from 'react-native-paper';
+import { RadioButton } from 'react-native-paper';
 import { MaterialIcons } from "@expo/vector-icons";
 import RNPickerSelect from 'react-native-picker-select';
 import DatePicker from 'react-native-modern-datepicker';
@@ -12,7 +12,6 @@ import moment from 'moment';
 
 const Filter = ({setfil, setShow, X}) => {
     const [checked, setChecked] = useState(false);
-    const [selectedChips, setSelectedChips] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString());
     const [pickerLocalCome, setPickerLocalCome] = useState('')
     const [pickerLocalArrive, setPickerLocalArrive] = useState('')
@@ -83,19 +82,7 @@ const Filter = ({setfil, setShow, X}) => {
     }
 
 
-    const handlePressChip = (chip) => {
-        if(chip!==undefined) {
-            setSelectedChips(chip)
-            setAll(false)
-        }
-        else{
-            setSelectedChips(''); 
-            setAll(true)
-        }
-        let array = setKeyValue('id_tag',chip);
-        setFilterQuery(array);
-
-    };
+   
   
     const handlePress = (value) => {
       setChecked(value);
@@ -176,35 +163,7 @@ const Filter = ({setfil, setShow, X}) => {
                     }
                 ))}            
                 />
-        </View>
-        <View >
-            <View style={{flexDirection:'row'}}>
-                    <MaterialIcons name="filter-alt" size={30} color={COLORS.black} style ={{marginLeft:15}} />
-                    <Text style = {{fontSize:16, marginLeft: 13, marginTop: 5}}>Tags</Text>
-            </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', padding: 8 }}>
-                {
-                    tags.map((tag) => (
-                        <Chip key={tag.id}
-                            mode="flat"
-                            selected={selectedChips === tag.id}
-                            onPress={() => handlePressChip(tag.id)}
-                            style={{ marginRight: 8, marginBottom: 8 }}
-                        >
-                            {tag.name}
-                        </Chip>
-                    ))
-                }
-                 <Chip 
-                    mode="flat"
-                    selected={all}
-                    onPress={() => handlePressChip(undefined)}
-                    style={{ marginRight: 8, marginBottom: 8 }}
-                >
-                    all
-                </Chip>
-            </View>
-        </View>     
+        </View> 
         <RadioButton.Group onValueChange={handlePress} value={checked}>
             <View style={{flexDirection:'row'}}>
                 <MaterialIcons name="star-border" size={30} color={COLORS.black} style ={{marginLeft:15}} />
