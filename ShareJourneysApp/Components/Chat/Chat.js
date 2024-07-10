@@ -5,8 +5,8 @@ import { addDoc, collection, doc, onSnapshot, orderBy, query, serverTimestamp ,d
 import { authentication, db, storage } from '../../firebase/firebaseconf';
 import { Ionicons } from '@expo/vector-icons'; // Bạn cần cài đặt thư viện @expo/vector-icons nếu chưa cài đặt
 import * as ImagePicker from 'expo-image-picker';
-import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import EmojiSelector, {Categories} from 'react-native-emoji-selector';
+import { uploadImage } from '../GroupChat/InitGroup';
 
 const Chat = ({route, navigation}) => {
   const [messages, setMessages] = useState([]);
@@ -92,43 +92,7 @@ console.log(uid,username, avatar)
     })
 
   }, [selectedImage, currentUser, uid])
-  
-  const uploadImage = async (uri) => {
-    try {
-      const storageRef = ref(storage, `images/${Date.now()}.jpg`);
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const uploadTask = uploadBytesResumable(storageRef, blob);
 
-      return new Promise((resolve, reject) => {
-        uploadTask.on('state_changed',
-          (snapshot) => {
-            // Handle progress, if needed
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log(`Upload is ${progress}% done`);
-          },
-          (error) => {
-            // Handle unsuccessful uploads
-            console.error('Error uploading image:', error);
-            reject(error);
-          },
-          () => {
-            // Handle successful uploads on completion
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              console.log('File available at', downloadURL);
-              resolve(downloadURL);
-            }).catch((error) => {
-              console.error('Error getting download URL:', error);
-              reject(error);
-            });
-          }
-        );
-      });
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      throw error;
-    }
-  };
 
   const pickImage = async () => {
     let { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -250,6 +214,7 @@ console.log(uid,username, avatar)
                 }}
               />
             )}
+            
             onLongPress={(context) => handleLongPress(context, props)}
           />
           { isInArray && props.currentMessage._id===showDeleteButton&& (

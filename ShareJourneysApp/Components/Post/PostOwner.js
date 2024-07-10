@@ -13,7 +13,7 @@ const PostOwner = ({navigation,Owner}) => {
               </View>
               <View style = {{width: '50%'}}>
                     <Text>Được tạo bởi: </Text>
-                    <Text style = {{fontSize: 20, fontWeight: 'bold'}}>{Owner.username }</Text>
+                    <Text style = {{fontSize: 13, fontWeight: 'bold'}}>{Owner.username }</Text>
                     <Text style = {{fontSize: 15, fontWeight: 'bold'}}> Đánh giá: {(Owner.avgRate).toFixed(1)}/5</Text>
               </View>
               <View style = {{width: '30%'}}>

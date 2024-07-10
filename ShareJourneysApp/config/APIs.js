@@ -1,24 +1,24 @@
 import axios from "axios";
 
 // const BASE_URL = 'https://chuongngo178.pythonanywhere.com/';
-const BASE_URL = 'http://192.168.1.16:8000/';
+const BASE_URL = 'http://192.168.1.17:8000/';
 
 export const endpoints = {
     'local': '/local/',
     'picture': '/picture/',
-     'transport': '/transports/',
-     'tag':'/tags/',
-     'report':"/reports/",
-     'users': "/users/",
-     'allposts':"/allposts/",
-     'posts': (post_id) => `/posts/${post_id}/`,
-     'comments': (post_id) => `/posts/${post_id}/comments/`,
-     'reply': (comment_id) => `/comments/${comment_id}/replies/`,
-     'login': '/o/token/',
-     'current-user': '/users/current-user/',
-     'add-comment': (post_id) => `/posts/${post_id}/comments/`,
-     'add-rep': (comment_id) => `/comments/${comment_id}/replies/`,
-     'add-tick': (post_id,comment_id) => `/posts/${post_id}/comments/${comment_id}/tick/`,
+    'transport': '/transports/',
+    'tag':'/tags/',
+    'report':"/reports/",
+    'users': "/users/",
+    'allposts':"/allposts/",
+    'posts': (post_id) => `/posts/${post_id}/`,
+    'comments': (post_id) => `/posts/${post_id}/comments/`,
+    'reply': (comment_id) => `/comments/${comment_id}/replies/`,
+    'login': '/o/token/',
+    'current-user': '/users/current-user/',
+    'add-comment': (post_id) => `/posts/${post_id}/comments/`,
+    'add-rep': (comment_id) => `/comments/${comment_id}/replies/`,
+    'add-tick': (post_id,comment_id) => `/posts/${post_id}/comments/${comment_id}/tick/`,
     'deleteCompanion':  (post_id) => `/posts/${post_id}/travelCompanion/`,
     'report':"/reports/",
     'reportUser': (reportId) => `/reports/${reportId}/userReport/`,

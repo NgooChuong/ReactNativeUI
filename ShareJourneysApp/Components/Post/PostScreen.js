@@ -94,12 +94,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
                         marginLeft:-10,marginRight:-10, color: color.primary,textAlign:"center" }}>
                       {user.title}
                     </Text>
+                    <View style={{flexDirection:'row', justifyContent:'space-between'}}>
                     <Text 
                       style={{ lineHeight: 24,
                         marginLeft:2, color: "red", fontSize: 14 }}>
                       {user.avgRate}
                       <FontAwesome name="star" size={15} color={color.secondary} />
                     </Text>
+                    <Text 
+                    
+                      style={{ lineHeight: 24,
+                        marginLeft:2, color: "red", fontSize: 14 }}>
+                      {user.state == "Publish" && <FontAwesome name="check-square-o" size={15} color={color.secondary} />}
+                      {user.state == "Reject" && <FontAwesome name="remove" size={15} color='red' />}
+                      {user.state == "" && <FontAwesome name="twitch" size={15} color='blue' />}
+                      {user.state==""?"Đang xét duyệt":user.state}
+                    </Text>
+                    </View>
               </View>
              
         </TouchableOpacity>

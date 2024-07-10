@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity,Image, TextInput } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity,Image, TextInput, Alert } from 'react-native';
 import { doc, getDoc } from 'firebase/firestore';
-import { getGroupMembers, removeMemberFromGroup } from './InitGroup'; // Import removeMemberFromGroup function
+import { changeAvatar, changeName, getGroupMembers, removeMemberFromGroup, uploadImage } from './InitGroup'; // Import removeMemberFromGroup function
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants';
 import * as ImagePicker from "expo-image-picker";
 
-const GroupMemberList = ({ route }) => {
+const GroupMemberList = ({ navigation,route }) => {
   const { groupId,userId ,avatar,name} = route.params;
   const [selectedImage, setSelectedImage] = useState(avatar);
   const [nameChange, setNameChange] = useState(name);
@@ -59,13 +59,39 @@ const GroupMemberList = ({ route }) => {
     let result = await ImagePicker.launchImageLibraryAsync();
   
     if (!result.canceled) {
-      setSelectedImage(result.assets[0])
-
+      const imageUrl = await uploadImage(result.assets[0].uri);
+      await changeAvatar(groupId, imageUrl)
+      setSelectedImage(imageUrl)
+      Alert.alert('Thay đổi thành công');
     }
     
   };
+
+  const handleTextSubmit = async () => {
+      await changeName(groupId,nameChange);
+      Alert.alert('Thay đổi thành công');
+  };
+
+
   return (
     <View style={styles.container}>
+      <View style={{width:'100%',height:50,position:'relative',marginTop:20}}>
+        <TouchableOpacity
+        style={
+              styles.touchableOpacityGoBack
+
+        }
+        onPress={() =>{
+          navigation.navigate('GroupChatScreen1', {
+            groupId: groupId,
+            userId: userId,
+            name: nameChange,
+          })
+        }}
+      >
+        <MaterialIcons name="arrow-back" size={30} color="black" />
+      </TouchableOpacity>
+          </View >
       <View>
       <View
             style={{
@@ -74,7 +100,7 @@ const GroupMemberList = ({ route }) => {
           >
             <TouchableOpacity onPress={handleImageSelection}>
               <Image
-                source={{ uri: selectedImage }}
+                source={{ uri:  selectedImage}}
                 style={{
                   height: 170,
                   width: 170,
@@ -116,6 +142,8 @@ const GroupMemberList = ({ route }) => {
                   onChangeText={(value) => setNameChange(value)}
                   editable={input}
                   style={{fontSize:20, color:COLORS.black}}
+                  onSubmitEditing={handleTextSubmit} // Bắt sự kiện nhấn nút tick
+                  returnKeyType="done" // Điều chỉnh loại nút trên bàn phím (done, go, search, send, etc.)
                 />                
                 <TouchableOpacity onPress={()=>setInputText(!input)}>
                   <MaterialIcons

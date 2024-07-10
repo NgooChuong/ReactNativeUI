@@ -56,6 +56,9 @@ const Home = ({ navigation }) => {
         <MaterialIcons name="add-box" size={30} color="black" />
         <Text style={{fontSize:15, alignSelf:'center'}} >Tạo Nhóm</Text>
       </TouchableOpacity>
+      {
+        users.length===0 && <ActivityIndicator/>
+}
       <FlatList
           data={users}
           key={user => user.username}
@@ -81,10 +84,14 @@ const Home = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <ListItem
-            onPress={() => navigation.navigate('GroupChatScreen', {groupId: item.id, userId:authentication?.currentUser?.uid,name:item.name})}
+            onPress={() => navigation.navigate('GroupChatScreen', {
+              groupId: item.id,
+              userId: authentication?.currentUser?.uid,
+              name: item.name,
+            })}
             title={item.name}
             subTitle={`Creator: ${item.creator_by}`}
-            // Assuming you have an image URL or avatar for the group
+            image={item.avatar}  // Assuming avatar URL is stored in item.avatar
           />
         )}
       />

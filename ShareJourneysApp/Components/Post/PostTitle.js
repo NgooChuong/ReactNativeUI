@@ -75,6 +75,14 @@ const PostTitle = ({post})=>{
                 }
             </Text>
         </Surface>
+        <Surface style = {{...styles.tag, marginLeft:10,flexDirection:'row', }} elevation={5}>
+            <MaterialIcons name="safety-check" size={20} color={COLORS.black} style ={{margin:10}} />
+            <Text style = {{fontSize: SIZES.h2}}>
+                {
+                    post.state
+                }
+            </Text>
+        </Surface>
         </View>
        
         

@@ -21,7 +21,7 @@ const HomeNavigate = () => {
         <Stack.Screen name="PostDetail2" options={{headerShown: false}} component={PostDetail} />
         <Stack.Screen name="Chat" options={{headerShown: false}} component={Chat} />
         <Stack.Screen name="GroupChatInDetail" options={{headerShown: false}} component={GroupChatInDetail} />
-        
+
       </Stack.Navigator>
     </>
            

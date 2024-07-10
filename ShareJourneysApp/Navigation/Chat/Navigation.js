@@ -30,8 +30,14 @@ const ChatNavigate = () => {
                     headerShown: false
                 }}
                 />
-                 <Stack.Screen name="GroupMemberList" component={GroupMemberList} />
-
+                 <Stack.Screen name="GroupMemberList" options={{headerShown: false}} component={GroupMemberList} />
+                 <Stack.Screen
+                  name='GroupChatScreen1'
+                  component={GroupChatScreen}
+                  options={{
+                    headerShown: false
+                }}
+                />
       </Stack.Navigator>
     </>
            

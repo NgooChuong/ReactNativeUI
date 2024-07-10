@@ -1,6 +1,7 @@
 import { collection, doc, setDoc, serverTimestamp, getFirestore, arrayUnion, arrayRemove, query, where, getDocs, getDoc, limit, updateDoc, onSnapshot, addDoc, orderBy, deleteDoc } from 'firebase/firestore'; 
 import { getAuth } from 'firebase/auth';
-import { db } from '../../firebase/firebaseconf';
+import { db, storage } from '../../firebase/firebaseconf';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 
 // Initialize Firestore and Auth
 
@@ -159,6 +160,7 @@ export const listenGroupMessages = (groupId, callback) => {
       createdAt: serverTimestamp(),
     });
   };
+  
   export const getGroupMembers = async (groupId) => {
     try {
       const docSnap= await getGroup(groupId);
@@ -186,10 +188,10 @@ export const listenGroupMessages = (groupId, callback) => {
       // Reference to the group document
       const groupDoc= await getGroup(groupId);
 
-  
+      const groupRef = doc(db, 'groups', groupId);
+
       if (groupDoc.exists()) {
         // Update the creator and creator_by fields
-        console.log("Group document exists. Data:", groupDoc.data());
         await updateDoc(groupRef, {
           creator: newCreatorId,
           creator_by: newCreatorEmail
@@ -200,5 +202,81 @@ export const listenGroupMessages = (groupId, callback) => {
       }
     } catch (error) {
       console.error("Error changing creator: ", error);
+    }
+  };
+  export const changeAvatar = async (groupId,avatar) => {
+    try {
+      // Reference to the group document
+      const groupDoc= await getGroup(groupId);
+      const groupRef = doc(db, 'groups', groupId);
+
+  
+      if (groupDoc.exists()) {
+        // Update the creator and creator_by fields
+        await updateDoc(groupRef, {
+          avatar: avatar,
+        });
+        console.log("Creator changed successfully");
+      } else {
+        console.log("Group document does not exist");
+      }
+    } catch (error) {
+      console.error("Error changing creator: ", error);
+    }
+  };
+  export const changeName = async (groupId,name) => {
+    try {
+      // Reference to the group document
+      const groupDoc= await getGroup(groupId);
+      const groupRef = doc(db, 'groups', groupId);
+
+  
+      if (groupDoc.exists()) {
+        // Update the creator and creator_by fields
+        await updateDoc(groupRef, {
+          name: name,
+        });
+        console.log("Creator changed successfully");
+      } else {
+        console.log("Group document does not exist");
+      }
+    } catch (error) {
+      console.error("Error changing creator: ", error);
+    }
+  };
+ export const uploadImage = async (uri) => {
+    try {
+      const storageRef = ref(storage, `images/${Date.now()}.jpg`);
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const uploadTask = uploadBytesResumable(storageRef, blob);
+
+      return new Promise((resolve, reject) => {
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            // Handle progress, if needed
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log(`Upload is ${progress}% done`);
+          },
+          (error) => {
+            // Handle unsuccessful uploads
+            console.error('Error uploading image:', error);
+            reject(error);
+          },
+          () => {
+            // Handle successful uploads on completion
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              console.log('File available at', downloadURL);
+              resolve(downloadURL);
+            }).catch((error) => {
+              console.error('Error getting download URL:', error);
+              reject(error);
+            });
+          }
+        );
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
     }
   };

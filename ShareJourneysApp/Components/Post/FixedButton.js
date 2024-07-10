@@ -10,6 +10,7 @@ import { collection, query, where, getDoc, doc, getDocs, setDoc, serverTimestamp
 import {getUserRoute} from '../CallAPI/Load';
 import { Searchbar } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
+import exportFile from '../ExportFile/ExportFile';
 
 
 const FixedButton = ({ Journey,navigation,setcompanion,userPost,id_post,companions}) => {
@@ -262,14 +263,29 @@ const FixedButton = ({ Journey,navigation,setcompanion,userPost,id_post,companio
 
           </ScrollView>
           {
-            userPost.username == dlUser[0].username && 
-            <TouchableOpacity style = {styles.button}
+            userPost.username == dlUser[0].username &&( 
+              <View style={{flexDirection:'row', justifyContent:'flex-end'}}>
+                <TouchableOpacity style = {{...styles.button,marginRight:0}}
             onPress={()=> navigation.navigate('GroupChatInDetail',{'userRoute': userRoute})}
           >
             <Text style={{color:'white'}}>              
               Tạo group
             </Text>
           </TouchableOpacity>
+          {console.log('user post', userRoute)}
+          <TouchableOpacity style = {{...styles.button,flexDirection:'row'}}
+            onPress={()=>exportFile(userRoute)}
+          >
+                          <MaterialIcons name="share" size={20} color="black" />         
+            <Text style={{color:'white'}}>     
+              Chia sẽ
+            </Text>
+          </TouchableOpacity>
+              </View>
+            
+            
+        )
+          
           }
            
           
@@ -287,9 +303,8 @@ const styles = StyleSheet.create({
     backgroundColor:COLORS.carrot, 
     alignItems:'center',
     justifyContent:'center',
-    marginLeft:150,
-    marginBottom:20,
     borderRadius: 5,
+    margin:20
     //
   },
   lineDis:{

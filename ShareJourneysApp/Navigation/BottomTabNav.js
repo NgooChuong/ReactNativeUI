@@ -20,6 +20,7 @@ import UpPostNavigate from "./UpPostNavigation/navigation";
 import Home from "../Components/Chat/Home";
 import ChatNavigate from "./Chat/Navigation";
 import {sendNotification} from "../Components/Notification/Notification";
+import exportFile from "../Components/ExportFile/ExportFile";
 
 const Tab = createBottomTabNavigator();
 
@@ -139,6 +140,7 @@ const BottomTabNav = () => {
           }}
           
         />
+       
       </Tab.Navigator>
 
   );

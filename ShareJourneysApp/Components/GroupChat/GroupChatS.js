@@ -20,8 +20,8 @@ const GroupChatScreen = ({ route, navigation }) => {
   const [modalVisibleMem, setModalVisibleMem] = useState(false);
   const [modalVisibleDelegate, setModalVisibleDelegate] = useState(false);
 
-  const openModal = () => setModalVisible(!modalVisible);
-  const closeModal = () => setModalVisible(false);
+  const toggleModal = () => setModalVisible(!modalVisible);
+  // const closeModal = () => setModalVisible(false);
 
   const handleAddMember = () => {
     // Implement logic to add member to group
@@ -40,7 +40,7 @@ const GroupChatScreen = ({ route, navigation }) => {
   const handleDelegate = () => {
     // Implement logic to delegate group
     setModalVisibleDelegate(true);
-    closeModal();
+    toggleModal();
   };
   const handleDeleteGroup = async () => {
     try {
@@ -80,9 +80,10 @@ const GroupChatScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     const unsubscribe = listenGroupMessages(groupId, (newMessages) => {
+      console.log(newMessages)
       setMessages(newMessages);
     });
-
+    console.log("Gdahdoiahodhaohfoiahofhoiahfoih")
     loadMembers();
     fetchGroupCreator(); // Fetch group creator ID
 
@@ -91,7 +92,7 @@ const GroupChatScreen = ({ route, navigation }) => {
         unsubscribe();
       }
     };
-  }, [groupId]);
+  }, []);
 
   const loadMembers = async () => {
     try {
@@ -127,6 +128,7 @@ const GroupChatScreen = ({ route, navigation }) => {
     }
   };
 
+
   // const renderActions = () => {
   //   return (
   //     <Button title="Add Member" onPress={handleAddMember} />
@@ -146,12 +148,12 @@ const GroupChatScreen = ({ route, navigation }) => {
           />
           <View style={{ flexDirection: "column", margin: 14 }}>
             <Text style={styles.nameText}>{name}</Text>
-            <TouchableOpacity onPress={openModal} style={styles.memberButton}>
+            <TouchableOpacity onPress={{}} style={styles.memberButton}>
               <Ionicons name="person" size={20} color="black" style={styles.modalIcon} />
               <Text style={styles.memberText}>Members: {members.memberCount}</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={openModal} style={styles.actionButton}>
+          <TouchableOpacity onPress={toggleModal} style={styles.actionButton}>
             <Ionicons name="ellipsis-vertical" size={24} color="black" />
           </TouchableOpacity>
         </View>
@@ -167,13 +169,17 @@ const GroupChatScreen = ({ route, navigation }) => {
         transparent={true}
         animationType="slide"
         visible={modalVisible}
-        onRequestClose={closeModal}
+        onRequestClose={toggleModal}
       >
-        <TouchableWithoutFeedback onPress={closeModal}>
+        <TouchableWithoutFeedback onPress={toggleModal}>
           <View style={styles.modalOverlay} />
         </TouchableWithoutFeedback>
         <View style={styles.modalContent}>
-          <TouchableOpacity onPress={() => navigation.navigate('GroupMemberList', { groupId,userId,avatar:members.avatar,name:members.name })} style={styles.modalItem}>
+          <TouchableOpacity onPress={() =>{
+             navigation.navigate('GroupMemberList', { groupId,userId,avatar:members.avatar,name:members.name })
+             toggleModal()
+            }
+             } style={styles.modalItem}>
             <Ionicons name="list" size={20} color="black" style={styles.modalIcon} />
             <Text>View Group Members</Text>
           </TouchableOpacity>

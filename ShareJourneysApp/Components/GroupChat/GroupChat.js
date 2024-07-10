@@ -13,15 +13,18 @@ const GroupChat = ({ route }) => {
   const [members, setMembers] = useState([]);
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [chatId, setChatId] = useState(null);
-  const [isConfirmed, setIsConfirmed] = useState(false);
-  const [confirmedMembers, setConfirmedMembers] = useState([]);
+  const [isConfirmed, setIsConfirmed] = useState(true);
+  const [confirmedMembers, setConfirmedMembers] = useState([{}]);
 
   const handleCreateNameGroup = async () => {
     try {
-      const id = await createGroup(groupName, userId, [{uid:userId,user:dlUser[0].username}], dlUser[0].username);
-      setChatId(id);
-      setIsConfirmed(true); // Set confirmation flag to true after successful group creation
-      setConfirmedMembers([...members, dlUser[0].username]); // Add creator as confirmed member
+      console.log("d",dlUser[0].username);
+      // const id = await createGroup(groupName, userId, [{uid:userId,user:dlUser[0].username}], dlUser[0].username);
+      // setChatId(id);
+      console.log("vo day",userId)
+      setIsConfirmed(false); // Set confirmation flag to true after successful group creation
+      setMembers([{ uid: userId,
+        username: dlUser[0].username}]); // Add creator as confirmed member
     } catch (error) {
       Alert.alert('Error', error.message);
     }
@@ -29,34 +32,47 @@ const GroupChat = ({ route }) => {
 
   const handleAddMember = async () => {
     try {
-      const user = await getUserByEmail(newMemberEmail);
-      await addMemberToGroup(chatId,user,newMemberEmail);
-      setMembers([...members, newMemberEmail]);
-      setNewMemberEmail('');
-      setIsConfirmed(true);
+      console.log("emaldad",newMemberEmail);
+      let user = await getUserByEmail(newMemberEmail);
+
+      // await addMemberToGroup(chatId,user,newMemberEmail);
+      console.log("dada",user);
+      if(user != null)
+      {
+        console.log("vao day sau",user);
+        setMembers([
+          ...members,
+          {
+            uid: user,
+            username: newMemberEmail,
+          },
+        ]);
+        setNewMemberEmail('');
+        setIsConfirmed(false);
+      }
+      else{
+        Alert.alert("sasi raaj khong tim thay")
+      }
+      
     } catch (error) {
       Alert.alert('Error', error.message);
     }
   };
 
   const handleConfirm = () => {
-    console.log("ISC",isConfirmed)
-    if (!isConfirmed) {
-      console.log("vo neeeeee");
-
-      handleCreateNameGroup(); // Call group creation if not confirmed
-    } else {
+   
       console.log("vo addd ne");
       handleAddMember(); // Otherwise add member to the group
-    }
   };
 
   const handleRemoveMember = async (memberEmail) => {
     try {
-      const user = await getUserByEmail(memberEmail);
-      await removeMemberFromGroup(chatId, user);
-      setIsConfirmed(true);
-      setMembers(members.filter(m => m !== memberEmail)); 
+      console.log("damdada",members);
+      console.log("dada",memberEmail);
+      // const user = await getUserByEmail(memberEmail);
+      // await removeMemberFromGroup(chatId, user);
+      setIsConfirmed(false);
+      setMembers(prevMembers => prevMembers.filter(m => m.username !== memberEmail.username)); 
     } catch (error) {
       Alert.alert('Error', error.message);
     }
@@ -64,24 +80,37 @@ const GroupChat = ({ route }) => {
 
   const handleDeleteGroup = async () => {
     try {
-      await deleteGroup(chatId);
+      // await deleteGroup(chatId);
       setChatId(null);
       setGroupName('');
       setMembers([]);
       setConfirmedMembers([]); // Clear confirmed members on group deletion
-      setIsConfirmed(false); // Reset confirmation state
+      setIsConfirmed(true); // Reset confirmation state
     } catch (error) {
       Alert.alert('Error', error.message);
     }
   };
 
-  const handleCreateGroup = () => {
-    navigation.navigate('GroupChatScreen', { groupId: chatId, userId: userId, name: groupName });
+  const handleCreateGroup = async () => {
+    // Example of creating a group, uncomment and adjust according to your needs
+    const id = await createGroup(groupName, userId, [{uid: userId, user: dlUser[0].username}], dlUser[0].username);
+    console.log("sasa", members);
+  
+    for (const m of members) {
+      console.log("member", m.uid, m.username);
+      // Assuming addMemberToGroup needs chatId, user, and email
+      await addMemberToGroup(id, m.uid, m.username);
+    }
+    navigation.navigate('GroupChatScreen', { groupId: id, userId: userId, name: groupName });
+
   };
+      
+    
+
 
   return (
     <View style={styles.container}>
-      {!chatId ? (
+      {isConfirmed === true ? (
         <View style={styles.section}>
           <TextInput
             style={styles.input}
@@ -89,7 +118,7 @@ const GroupChat = ({ route }) => {
             value={groupName}
             onChangeText={setGroupName}
           />
-          <Button title="Create Group" onPress={handleConfirm} />
+          <Button title="Create Group" onPress={handleCreateNameGroup} />
         </View>
       ) : (
         <View style={styles.section}>
@@ -104,46 +133,40 @@ const GroupChat = ({ route }) => {
             <TouchableOpacity style={styles.touchableButton} onPress={handleConfirm}>
               <Text style={styles.touchableText}>Add Member</Text>
             </TouchableOpacity>
-            {isConfirmed && (
+            {!isConfirmed && (
               <View style={{flexDirection:"row"}}>
                 <TouchableOpacity style={styles.touchableButton} onPress={handleDeleteGroup}>
                   <Text style={styles.touchableText}>Delete Group</Text>
                 </TouchableOpacity>
                 {
-                  members.length > 1 && <TouchableOpacity style={styles.touchableButton} onPress={handleCreateGroup}>
+                  members.length > 2 && <TouchableOpacity style={styles.touchableButton} onPress={handleCreateGroup}>
                   <Text style={styles.touchableText}>Confirm Group</Text>
                 </TouchableOpacity>
                 }
-                
              </View>
             )}
           </View>
 
           {/* Display confirmed members */}
-          {isConfirmed && (
-            <View style={styles.section}>
-              <Text style={styles.groupTitle}>Confirmed Members:</Text>
-              <FlatList
-                data={confirmedMembers}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <View style={styles.memberContainer}>
-                    <Text style={styles.memberText}>{item}</Text>
-                  </View>
-                )}
-              />
-            </View>
-          )}
-           <FlatList
-            data={members}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <View style={styles.memberContainer}>
-                <Text style={styles.memberText}>{item}</Text>
-                <Button title="Remove" onPress={() => handleRemoveMember(item)} />
-              </View>
-            )}
-          />
+          {!isConfirmed && (
+  <View style={styles.section}>
+    <Text style={styles.groupTitle}>Confirmed Members:</Text>
+    <FlatList
+      data={members}
+      
+      keyExtractor={(item) => item.uid} // Use uid as the key
+      renderItem={({ item }) => (
+        <View style={styles.memberContainer}>
+          <Text style={styles.memberText}>{item.username}</Text>
+          {item.username !== dlUser[0].username && 
+            <Button title="Remove" onPress={() => handleRemoveMember(item)} />
+          }
+        </View>
+      )}
+    />
+  </View>
+)}
+                    
 
         </View>
       )}
